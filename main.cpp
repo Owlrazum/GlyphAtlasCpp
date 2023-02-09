@@ -2,7 +2,8 @@
 #include <format>
 
 #include "Slack.h"
-#include "SvgWriter.h"
+#include "GlyphAtlasUtils.h"
+#include "GlyphAtlas.h"
 
 extern "C" DLLEXPORT int Test()
 {
@@ -10,38 +11,29 @@ extern "C" DLLEXPORT int Test()
     return 42;
 }
 
+vector<Rect> Generation(const std::string path, int count)
+{
+    auto rects = GenerateRects(count, {8, 64, 8, 64});
+    WriteRects(path, rects);
+    return rects;
+}
+
+vector<Rect> Reading(const std::string path)
+{
+    auto rects = ReadRects(path);
+    return rects;
+}
+
 int main()
 {
-    Pair dims {400, 400};
-    SvgWriter writer("../Visual.svg", dims, whiteBack);
-    Rect rect {0, 0, 90, 90};
-    while (rect.y < dims.y)
-    {
-        while (rect.x < dims.x)
-        {
-            writer.WriteRect(rect, cream, 1, burntOrange);
-            rect.x += 103; // hard for me to justify why exactly "103"
-        }
-        rect.y += 103;
-        rect.x = 0;
-    }
+    const std::string path = "../rects.txt";
 
-    writer.BlankLine();
-    writer.WriteRect(Rect {125, 125, 150, 150}, whiteBack);
+    auto rects = Generation(path, 50);
+//    auto rects = Reading(path);
 
-    Pair innerConstraints {250, 250};
-    rect.Update(150, 150, 50, 50);
-    while(rect.y < innerConstraints.y)
-    {
-        while(rect.x < innerConstraints.x)
-        {
-            writer.WriteRect(rect, burntOrange, 1, cream);
-            rect.x += 50;
-        }
-        rect.y += 50;
-        rect.x = 150;
-    }
-
+    GlyphAtlas atlas;
+    atlas.Update(rects);
+    WriteGlyphAtlas(atlas);
     std::cout << "completed" << std::endl;
     return 0;
 }

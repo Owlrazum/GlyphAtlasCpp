@@ -7,6 +7,7 @@
 
 #include "Rect.h"
 #include <vector>
+#include "math.h"
 
 using namespace std;
 
@@ -14,8 +15,22 @@ class GlyphAtlas
 {
 public:
     GlyphAtlas();
-    vector<Rect> rects;
+
+    void Update(vector<Rect> newRects);
+
+    vector<Rect> GetRects() const
+    {
+        return rects;
+    }
+
+    Pair GetDims() const
+    { return dims; }
+
 private:
+    vector<Rect> rects;
+    Pair dims;
+
+    static bool CompareGreater(const Rect& lhs, const Rect& rhs);
 };
 
 #endif //CLION_GLYPHATLAS_H

@@ -4,4 +4,5 @@ target_sources(GlyphAtlas
             GlyphAtlas.h
             Rect.cpp
             Rect.h
+            GlyphAtlasUtils.h
 )
