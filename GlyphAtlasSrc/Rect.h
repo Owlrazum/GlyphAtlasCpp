@@ -35,7 +35,7 @@ public:
     int GetArea() { return w * h;}
     void Update(ushort x, ushort y, ushort w, ushort h);
 
-    std::string ToString();
+    std::string ToString() const;
 };
 
 

@@ -16,7 +16,7 @@ Rect::Rect(std::string serialized)
     in >> buf >> x >> y >> buf >> w >> h >> buf;
 }
 
-std::string Rect::ToString()
+std::string Rect::ToString() const
 {
     return "pos: " + std::to_string(x) + " " + std::to_string(y) + " size: " + std::to_string(w) + " " + std::to_string(h)+ "\n";
 }

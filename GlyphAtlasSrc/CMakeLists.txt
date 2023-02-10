@@ -5,4 +5,6 @@ target_sources(GlyphAtlas
             Rect.cpp
             Rect.h
             GlyphAtlasUtils.h
+            Shelf.cpp
+            Shelf.h
 )

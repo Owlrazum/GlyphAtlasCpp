@@ -11,14 +11,14 @@ extern "C" DLLEXPORT int Test()
     return 42;
 }
 
-vector<Rect> Generation(const std::string path, int count)
+std::vector<Rect> Generation(const std::string path, int count)
 {
     auto rects = GenerateRects(count, {8, 64, 8, 64});
     WriteRects(path, rects);
     return rects;
 }
 
-vector<Rect> Reading(const std::string path)
+std::vector<Rect> Reading(const std::string path)
 {
     auto rects = ReadRects(path);
     return rects;
@@ -28,10 +28,13 @@ int main()
 {
     const std::string path = "../rects.txt";
 
-    auto rects = Generation(path, 50);
-//    auto rects = Reading(path);
+//    auto rects = Generation(path, 50);
+    auto rects = Reading(path);
 
-    GlyphAtlas atlas;
+    const std::vector<ushort> heightDelimiters {8, 16, 32, 48, 64};
+    const std::vector<ushort> widthDelimiters {8, 16, 32, 48, 64};
+
+    GlyphAtlas atlas {heightDelimiters, widthDelimiters};
     atlas.Update(rects);
     WriteGlyphAtlas(atlas);
     std::cout << "completed" << std::endl;
