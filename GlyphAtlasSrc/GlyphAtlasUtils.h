@@ -1,13 +1,12 @@
-//
-// Created by Abai on 09.02.2023.
-//
-#include <random>
+#pragma once
 
 #include "GlyphAtlas.h"
 #include "SvgWriter.h"
 #include "Colors.h"
 
-static std::vector<Rect> ReadRects(const std::string path, const size_t maxRectsCount = 50)
+#include <random>
+
+static std::vector<Rect> ReadRects(const std::string path)
 {
     std::ifstream in {path};
     std::string line;
@@ -49,11 +48,11 @@ static std::vector<Rect> GenerateRects(int count, Quad minMax)
 
 static void WriteGlyphAtlas(const GlyphAtlas& atlas)
 {
-    std::cout << "writing to ../Visual.svg";
-    SvgWriter writer("../Visual.svg", atlas.GetDims(), whiteBack);
-    auto rects = atlas.GetRects();
-    for (Rect rect : rects)
+    std::cout << "writing to ../Visual.svg\n";
+    SvgWriter writer("../Visual.svg", atlas.GetTextureDims(0), whiteBack);
+    auto rects = atlas.GetGlyphs();
+    for (Glyph glyph : rects)
     {
-        writer.WriteRect(rect, cream, 1, burntOrange);
+        writer.WriteRect(glyph.rect, cream, 1, burntOrange);
     }
 }

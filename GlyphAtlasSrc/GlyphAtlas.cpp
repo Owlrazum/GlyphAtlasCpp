@@ -1,5 +1,8 @@
 #include "GlyphAtlas.h"
 
+#include <iostream>
+#include <cmath>
+
 void GlyphAtlas::InitializeDims(std::vector<Rect> newRects)
 {
     int totalArea = 0; // ideal packing
@@ -9,7 +12,8 @@ void GlyphAtlas::InitializeDims(std::vector<Rect> newRects)
     }
 
     ushort dim = sqrt(totalArea * 2); // have double the ideal packing
-    dims = {dim, dim};
+    Pair dims = {dim, dim};
+    textures.push_back(dims);
 
     freeSpacesForShelves.push_back({0, 0, dim, dim});
 
@@ -33,7 +37,7 @@ void GlyphAtlas::Update(std::vector<Rect> newRects)
         {
             CreateShelf(toFit);
         }
-        rects.push_back(toFit);
+        glyphs.push_back({0, glyphIdCount++, toFit});
     }
 }
 
@@ -61,7 +65,7 @@ bool GlyphAtlas::FitInExistingSpot(Rect& rect)
 }
 
 /// creates and adds rect to the shelf
-// todo add several texture handling
+// todod add several texture handling
 void GlyphAtlas::CreateShelf(Rect& toFit)
 {
     ushort shelfHeight = -1;
@@ -80,7 +84,6 @@ void GlyphAtlas::CreateShelf(Rect& toFit)
         throw std::out_of_range("received delimiters for shelves are not big enough to contain the rect: " + toFit.ToString());
     }
 
-    Pair pos {0, 0};
     for (int i = 0; i < freeSpacesForShelves.size(); i++)
     {
         if (shelfHeight <= freeSpacesForShelves[i].h)

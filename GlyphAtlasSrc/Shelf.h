@@ -1,12 +1,7 @@
-//
-// Created by Abai on 10.02.2023.
-//
+#pragma once
 
-#ifndef GLYPHATLAS_SHELF_H
-#define GLYPHATLAS_SHELF_H
-
-#include <vector>
 #include "Rect.h"
+#include <vector>
 
 class Shelf
 {
@@ -26,5 +21,3 @@ private:
 
     void SplitSlot(Rect& rect, ushort splitWidth);
 };
-
-#endif //GLYPHATLAS_SHELF_H

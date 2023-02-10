@@ -1,7 +1,3 @@
-//
-// Created by Abai on 10.02.2023.
-//
-
 #include "Shelf.h"
 
 /// Adds into a least possible slot

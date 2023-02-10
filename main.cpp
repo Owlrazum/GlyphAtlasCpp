@@ -1,5 +1,4 @@
 #include <iostream>
-#include <format>
 
 #include "Slack.h"
 #include "GlyphAtlasUtils.h"
@@ -31,8 +30,8 @@ int main()
 //    auto rects = Generation(path, 50);
     auto rects = Reading(path);
 
-    const std::vector<ushort> heightDelimiters {8, 16, 32, 48, 64};
-    const std::vector<ushort> widthDelimiters {8, 16, 32, 48, 64};
+    const std::vector<ushort> heightDelimiters {8, 16, 24, 32, 40, 48, 56, 64};
+    const std::vector<ushort> widthDelimiters {8, 16, 24, 32, 40, 48, 56, 64};
 
     GlyphAtlas atlas {heightDelimiters, widthDelimiters};
     atlas.Update(rects);

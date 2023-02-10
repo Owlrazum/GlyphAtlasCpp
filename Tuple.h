@@ -1,9 +1,4 @@
-//
-// Created by Abai on 09.02.2023.
-//
-
-#ifndef GLYPHATLAS_TUPLE_H
-#define GLYPHATLAS_TUPLE_H
+#pragma once
 
 typedef unsigned short ushort;
 
@@ -27,5 +22,3 @@ struct Quad
     ushort z;
     ushort w;
 };
-
-#endif //GLYPHATLAS_TUPLE_H

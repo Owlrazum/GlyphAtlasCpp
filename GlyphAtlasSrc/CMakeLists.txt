@@ -7,4 +7,5 @@ target_sources(GlyphAtlas
             GlyphAtlasUtils.h
             Shelf.cpp
             Shelf.h
+            Glyph.h
 )

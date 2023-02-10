@@ -1,24 +1,10 @@
-//
-// Created by Abai on 08.02.2023.
-//
-
-#ifndef GLYPHATLAS_SVGWRITER_H
-#define GLYPHATLAS_SVGWRITER_H
+#pragma once
 
 #include "Rect.h"
-
-#ifndef STRING_H
-#define STRING_H
-#include <string>
-#endif
-
-#ifndef COLORS_H
-#define COLORS_H
 #include "Colors.h"
-#endif
 
 #include <fstream>
-#include <iostream>
+#include <string>
 
 class SvgWriter
 {
@@ -45,5 +31,3 @@ private:
 
     inline static const std::string svgClose = "\n</svg>";
 };
-
-#endif //GLYPHATLAS_SVGWRITER_H

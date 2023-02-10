@@ -1,23 +1,7 @@
-//
-//
-//
-//
-//
-// Created by Abai on 07.02.2023.
-//
+#pragma once
 
-#ifndef CLION_RECT_H
-#define CLION_RECT_H
-
-#ifndef STRING_H
-#define STRING_H
-#include <string>
-#endif
-
-#ifndef TUPLE_H
-#define TUPLE_H
 #include "Tuple.h"
-#endif
+#include <string>
 
 class Rect
 {
@@ -37,6 +21,3 @@ public:
 
     std::string ToString() const;
 };
-
-
-#endif //CLION_RECT_H
