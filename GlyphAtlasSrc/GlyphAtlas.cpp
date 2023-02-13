@@ -37,7 +37,7 @@ void GlyphAtlas::Update(std::vector<Rect> newRects)
         {
             CreateShelf(toFit);
         }
-        glyphs.push_back({0, glyphIdCount++, toFit});
+//        glyphs.emplace_back({0, glyphIdCount++, toFit});
     }
 }
 

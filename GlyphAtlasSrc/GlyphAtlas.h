@@ -1,27 +1,9 @@
-/*
- * struct FontKey {
-    uint8 fontId;
-    float fontSize;
-    float sdfPadding;
-    TypeMask mask;
-}
-enum TypeMask {
-    Sdf,
-    Msdf,
-    Raster,
-    RasterOutline,
-}
-
- GlyphHandle GetGlyph(FontKey key, GlyphId id);
-
- struct GlyphHandle { int textureId; ushort x, y, w, h; }
- */
-
 #pragma once
 
-#include "Rect.h"
+#include "Math/Rect.h"
 #include "Shelf.h"
 #include "Glyph.h"
+#include "FontKey.h"
 
 #include <vector>
 
@@ -39,6 +21,8 @@ public:
     };
 
     void Update(std::vector<Rect> newRects);
+    void Update(std::vector<std::vector<Rect>> rectsByFont);
+//    GlyphHandle GetGlyph(FontKey key, GlyphId id);
 
     std::vector<Glyph> GetGlyphs() const
     {

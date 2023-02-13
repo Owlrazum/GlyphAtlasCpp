@@ -6,29 +6,6 @@
 
 #include <random>
 
-static std::vector<Rect> ReadRects(const std::string path)
-{
-    std::ifstream in {path};
-    std::string line;
-    std::vector<Rect> rects;
-    while(std::getline(in, line))
-    {
-        Rect rect {line}; // maybe throw an exception if not okay
-        rects.push_back(rect);
-    }
-
-    return rects;
-}
-
-static void WriteRects(const std::string path, const std::vector<Rect> rects)
-{
-    std::ofstream out {path};
-    for (Rect rect : rects)
-    {
-        out << rect.ToString();
-    }
-}
-
 static std::vector<Rect> GenerateRects(int count, Quad minMax)
 {
     std::vector<Rect> rects; // toask: should I preallocate here?
@@ -44,6 +21,17 @@ static std::vector<Rect> GenerateRects(int count, Quad minMax)
         rects.push_back(rect);
     }
     return rects;
+}
+
+static std::vector<int> GenerateGlyphIds(int count)
+{
+    std::vector<int> data;
+    for (int i = 0; i < count; i++)
+    {
+        data.push_back(i);
+    }
+
+    return data;
 }
 
 static void WriteGlyphAtlas(const GlyphAtlas& atlas)
