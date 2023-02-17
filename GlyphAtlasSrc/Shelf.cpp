@@ -43,3 +43,8 @@ void Shelf::SplitSlot(Rect &rect, ushort splitWidth)
         rect.Update(rect.x + slotWidth, rect.y, rect.w - slotWidth, rect.h); // ushort overflow was here outside of if :)
     }
 }
+
+const std::vector<Rect> &Shelf::GetFreeSlots() const
+{
+    return freeSlots;
+}

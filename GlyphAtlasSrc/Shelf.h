@@ -16,6 +16,7 @@ public:
     Pair minMaxHeight; // used to not place too short inside shelf.
 
     bool TryAdd(Glyph& glyph);
+    const std::vector<Rect>& GetFreeSlots() const;
 private:
     std::vector<Rect> freeSlots;
     const std::vector<ushort> widthDelimiters;

@@ -28,6 +28,11 @@ struct GlyphKey
     ushort fontId;
     ushort glyphId;
 
+    [[nodiscard]] std::string ToString() const
+    {
+        return std::to_string(fontId) + ":" + std::to_string(glyphId);
+    }
+
     bool operator<(const GlyphKey &rhs) const
     {
         if (fontId < rhs.fontId)

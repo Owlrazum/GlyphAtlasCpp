@@ -29,7 +29,12 @@ bool GlyphAtlas::CompareByHeight(const std::pair<GlyphKey, Glyph> &lhs, const st
     return lhs.second.rect.h > rhs.second.rect.h;
 }
 
-const std::vector<Glyph> GlyphAtlas::GetGlyphsFromTexture(int textureId) const
+const std::vector<std::pair<GlyphKey, Glyph>> GlyphAtlas::GetGlyphsFromTexture(int textureId) const
 {
     return textures[textureId].GetGlyphs();
+}
+
+const std::pair<std::vector<Rect>, std::vector<Rect>> GlyphAtlas::GetFreeShelfSlotSpace(int textureId) const
+{
+    return textures[textureId].GetFreeShelfSlotSpace();
 }

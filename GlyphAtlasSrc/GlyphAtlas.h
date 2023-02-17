@@ -14,23 +14,30 @@ class GlyphAtlas
 public:
     GlyphAtlas(
             const std::vector<ushort> &shelfDelimitersArg,
-            const std::vector<ushort>& widthDelimitersArg,
+            const std::vector<ushort> &widthDelimitersArg,
             Pair textureMaxDimsArg)
             : shelfDelimiters(shelfDelimitersArg),
-            widthDelimiters(widthDelimitersArg),
-            textureMaxDims(textureMaxDimsArg)
+              widthDelimiters(widthDelimitersArg),
+              textureMaxDims(textureMaxDimsArg)
     {
         textures = std::vector<GlyphTexture>();
     };
 
-    void Update(const std::vector<GlyphKey>& keys);
+    void Update(const std::vector<GlyphKey> &keys);
 //    GlyphHandle GetGlyph(FontKey key, GlyphId id);
 
-    [[nodiscard]] const std::vector<Glyph> GetGlyphsFromTexture(int textureId) const;
+    [[nodiscard]] const std::vector<std::pair<GlyphKey, Glyph>> GetGlyphsFromTexture(int textureId) const;
+
+    [[nodiscard]] const std::pair<std::vector<Rect>, std::vector<Rect>> GetFreeShelfSlotSpace(int textureId) const; // the first vector is freeSpace for the shelves
 
     int GetTextureCount()
     {
         return static_cast<int>(textures.size());
+    }
+
+    Pair GetTextureMaxDims()
+    {
+        return textureMaxDims;
     }
 
 private:

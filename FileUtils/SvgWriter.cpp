@@ -22,12 +22,24 @@ void SvgWriter::WriteAtlas(GlyphAtlas &atlas)
     for (int i = 0; i < size; i++)
     {
         auto glyphs = atlas.GetGlyphsFromTexture(i);
-        std::ofstream out {GetTexturePath(i)};
+        int shelfFreeSpaceCount = 0;
+        auto freeRects = atlas.GetFreeShelfSlotSpace(i);
+        std::ofstream out{GetTexturePath(i)};
         out << opening;
         for (auto glyph: glyphs)
         {
-            WriteGlyphDefault(glyph, out);
+            WriteGlyphDefault(glyph, out, false);
         }
+
+        for (auto rect: freeRects.first)
+        {
+            WriteRect(rect, out, sandDollar, 1, oliveGreen);
+        }
+        for (auto rect: freeRects.second)
+        {
+            WriteRect(rect, out, yellowGreen, 1, coolGray);
+        }
+
         out << svgClose;
     }
 }
@@ -39,12 +51,25 @@ void SvgWriter::WriteRect(Rect rect, std::ofstream &out, const std::string &colo
         << "\" fill=\"" << color << "\" /> \n";
 }
 
-void SvgWriter::WriteGlyph(Glyph glyph, std::ofstream &out, const std::string &fillColor, ushort borderWidthHalf,
-                           const std::string &borderColor)
+void SvgWriter::WriteRect(Rect &rect, std::ofstream &out, const std::string &fillColor, ushort borderWidthHalf,
+                          const std::string &borderColor)
 {
-    out << indent << "<rect x=\"" << glyph.rect.x + borderWidthHalf << "\" y=\"" << glyph.rect.y + borderWidthHalf
-        << "\" width=\"" << glyph.rect.w - borderWidthHalf * 2 << "\" height=\"" << glyph.rect.h - borderWidthHalf * 2
+    out << indent << "<rect x=\"" << rect.x + borderWidthHalf << "\" y=\"" << rect.y + borderWidthHalf
+        << "\" width=\"" << rect.w - borderWidthHalf * 2 << "\" height=\"" << rect.h - borderWidthHalf * 2
         << "\" fill=\"" << fillColor
         << "\" stroke-width=\"" << borderWidthHalf * 2
         << "\" stroke=\"" << borderColor << "\"/> \n";
+}
+
+void SvgWriter::WriteGlyphDefault(std::pair<GlyphKey, Glyph> glyph, std::ofstream &out, bool writeKey)
+{
+    Rect& rect = glyph.second.rect;
+    WriteRect(rect, out, cream, 1, burntOrange);
+
+    if (writeKey)
+    {
+        std::string key = glyph.first.ToString();
+        out << indent << R"(<text x=")" << rect.x + rect.w / 3 << R"(" y=")" << rect.y + rect.h / 2 << '"'
+            << R"( font-family="Verdana" font-size="6" fill="black">)" << key << R"(</text>)" << "\n";
+    }
 }

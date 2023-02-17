@@ -67,14 +67,26 @@ void GlyphTexture::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
     }
 }
 
-std::vector<Glyph> GlyphTexture::GetGlyphs() const
+std::vector<std::pair<GlyphKey, Glyph>> GlyphTexture::GetGlyphs() const
 {
-    std::vector<Glyph> toReturn;
+    std::vector<std::pair<GlyphKey, Glyph>> toReturn;
     for (const auto& placedGlyph : placedGlyphs)
     {
-        toReturn.push_back(placedGlyph.second);
+        toReturn.emplace_back(placedGlyph);
     }
     return toReturn;
+}
+
+std::pair<std::vector<Rect>, std::vector<Rect>> GlyphTexture::GetFreeShelfSlotSpace() const
+{
+    std::vector<Rect> freeShelves (freeSpacesForShelves);
+    std::vector<Rect> freeSlots;
+    for (const Shelf & shelf : shelves)
+    {
+        auto shelfFreeSlots = shelf.GetFreeSlots();
+        freeSlots.insert(freeSlots.begin(), shelfFreeSlots.begin(), shelfFreeSlots.end());
+    }
+    return std::make_pair(freeShelves, freeSlots);
 }
 
 /// returns whether appropriate spot was found

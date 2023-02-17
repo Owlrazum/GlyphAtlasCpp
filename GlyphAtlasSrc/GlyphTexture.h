@@ -30,8 +30,8 @@ public:
 
     void Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
 
-    [[nodiscard]] std::vector<Glyph> GetGlyphs() const;
-
+    [[nodiscard]] std::vector<std::pair<GlyphKey, Glyph>> GetGlyphs() const;
+    [[nodiscard]] std::pair<std::vector<Rect>, std::vector<Rect>> GetFreeShelfSlotSpace() const; // the first vector is freeSpace for the shelves
 
     [[nodiscard]] ushort GetId() const
     { return id; }
