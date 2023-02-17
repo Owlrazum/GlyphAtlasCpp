@@ -5,7 +5,7 @@ Rect::Rect() : x(0), y(0), w(0), h(0)
 {
 }
 
-Rect::Rect(std::string serialized)
+Rect::Rect(const std::string& serialized)
 {
     std::istringstream in {serialized};
     std::string buf;
@@ -23,10 +23,10 @@ Rect::Rect(ushort xArg, ushort yArg, ushort wArg, ushort hArg)
 
 }
 
-void Rect::Update(ushort x, ushort y, ushort w, ushort h)
+void Rect::Update(ushort xArg, ushort yArg, ushort wArg, ushort hArg)
 {
-    this->x = x;
-    this->y = y;
-    this->w = w;
-    this->h = h;
+    this->x = xArg;
+    this->y = yArg;
+    this->w = wArg;
+    this->h = hArg;
 }

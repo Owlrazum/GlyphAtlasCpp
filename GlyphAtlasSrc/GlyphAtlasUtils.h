@@ -33,14 +33,3 @@ static std::vector<int> GenerateGlyphIds(int count)
 
     return data;
 }
-
-static void WriteGlyphAtlas(const GlyphAtlas& atlas)
-{
-    std::cout << "writing to ../Visual.svg\n";
-    SvgWriter writer("../Visual.svg", atlas.GetTextureDims(0), whiteBack);
-    auto rects = atlas.GetGlyphs();
-    for (Glyph glyph : rects)
-    {
-        writer.WriteRect(glyph.rect, cream, 1, burntOrange);
-    }
-}

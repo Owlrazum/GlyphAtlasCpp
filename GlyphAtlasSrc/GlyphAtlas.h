@@ -1,61 +1,47 @@
 #pragma once
 
 #include "Math/Rect.h"
-#include "Shelf.h"
 #include "Glyph.h"
+#include "GlyphKey.h"
+#include "GlyphTexture.h"
 #include "FontKey.h"
 
 #include <vector>
+#include <map>
 
 class GlyphAtlas
 {
 public:
-    GlyphAtlas(std::vector<ushort> shelfDelimitersArg, std::vector<ushort> widthDelimitersArg)
-            : shelfDelimiters(shelfDelimitersArg), widthDelimiters(widthDelimitersArg)
+    GlyphAtlas(
+            const std::vector<ushort> &shelfDelimitersArg,
+            const std::vector<ushort>& widthDelimitersArg,
+            Pair textureMaxDimsArg)
+            : shelfDelimiters(shelfDelimitersArg),
+            widthDelimiters(widthDelimitersArg),
+            textureMaxDims(textureMaxDimsArg)
     {
-        glyphs = std::vector<Glyph>();
-        shelves = std::vector<Shelf>();
-        freeSpacesForShelves = std::vector<Rect>();
-
-        textures = std::vector<Pair>();
+        textures = std::vector<GlyphTexture>();
     };
 
-    void Update(std::vector<Rect> newRects);
-    void Update(std::vector<std::vector<Rect>> rectsByFont);
+    void Update(const std::vector<GlyphKey>& keys);
 //    GlyphHandle GetGlyph(FontKey key, GlyphId id);
 
-    std::vector<Glyph> GetGlyphs() const
-    {
-        return glyphs;
-    }
-
-    Pair GetTextureDims(int textureId) const
-    { return textures[textureId]; }
+    [[nodiscard]] const std::vector<Glyph> GetGlyphsFromTexture(int textureId) const;
 
     int GetTextureCount()
     {
-        return textures.size();
+        return static_cast<int>(textures.size());
     }
 
 private:
-    bool isDimsInitialized;
-    int glyphIdCount;
+    Pair textureMaxDims;
 
-    void InitializeDims(std::vector<Rect> newRects);
+    int texturesCount{};
 
-    std::vector<Glyph> glyphs;
-    std::vector<Shelf> shelves;
-    std::vector<Rect> freeSpacesForShelves;
-    std::vector<Pair> textures;
+    std::vector<GlyphTexture> textures; // perhaps one glyphTexture can be referenced by multiple fonts
 
     const std::vector<ushort> shelfDelimiters;
     const std::vector<ushort> widthDelimiters;
 
-    bool FitInExistingSpot(Rect &rect);
-
-    void CreateShelf(Rect &rect);
-
-    std::pair<Rect, Rect> SplitFreeSpace(Rect &freeSpace, ushort splitHeight);
-
-    static bool CompareGreater(const Rect &lhs, const Rect &rhs);
+    static bool CompareByHeight(const std::pair<GlyphKey, Glyph> &lhs, const std::pair<GlyphKey, Glyph> &rhs);
 };

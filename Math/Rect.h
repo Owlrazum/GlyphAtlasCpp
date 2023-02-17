@@ -6,18 +6,18 @@
 class Rect
 {
 public:
-    ushort x;
-    ushort y;
+    ushort x{};
+    ushort y{};
 
-    ushort w;
-    ushort h;
+    ushort w{};
+    ushort h{};
 
     Rect();
     Rect(ushort xArg, ushort yArg, ushort wArg, ushort hArg);
-    Rect(std::string);
+    explicit Rect(const std::string&);
 
-    int GetArea() { return w * h;}
-    void Update(ushort x, ushort y, ushort w, ushort h);
+    [[nodiscard]] int GetArea() const { return w * h;}
+    void Update(ushort xArg, ushort yArg, ushort wArg, ushort hArg);
 
-    std::string ToString() const;
+    [[nodiscard]] std::string ToString() const;
 };

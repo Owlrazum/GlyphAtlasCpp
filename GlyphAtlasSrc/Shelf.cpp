@@ -1,30 +1,30 @@
 #include "Shelf.h"
 
 /// Adds into a least possible slot
-bool Shelf::TryAdd(Rect &rect)
+bool Shelf::TryAdd(Glyph &glyph)
 {
-    for (int i = 0; i < freeSlots.size(); i++)
+    for (auto & freeSlot : freeSlots)
     {
-        if (rect.w < freeSlots[i].w)
+        if (glyph.rect.w < freeSlot.w)
         {
-            rect.x = freeSlots[i].x;
-            rect.y = freeSlots[i].y;
-            SplitSlot(freeSlots[i], rect.w);
+            glyph.rect.x = freeSlot.x;
+            glyph.rect.y = freeSlot.y;
+            SplitSlot(freeSlot, glyph.rect.w);
             return true;
         }
     }
 
-    return false; // The rect width too large to fit into freeSlots of a shelf
+    return false; // The shelfRect width too large to fit into freeSlots of a shelf
 }
 
 void Shelf::SplitSlot(Rect &rect, ushort splitWidth)
 {
     ushort slotWidth = -1;
-    for (int i = 0; i < widthDelimiters.size(); i++)
+    for (ushort widthDelimiter : widthDelimiters)
     {
-        if (splitWidth < widthDelimiters[i])
+        if (splitWidth < widthDelimiter)
         {
-            slotWidth = widthDelimiters[i];
+            slotWidth = widthDelimiter;
             break;
         }
     }
@@ -40,6 +40,6 @@ void Shelf::SplitSlot(Rect &rect, ushort splitWidth)
     }
     else
     {
-        rect.Update(rect.x + slotWidth, rect.y, rect.w - slotWidth, rect.h); // ushort overflow was here outside of if)
+        rect.Update(rect.x + slotWidth, rect.y, rect.w - slotWidth, rect.h); // ushort overflow was here outside of if :)
     }
 }

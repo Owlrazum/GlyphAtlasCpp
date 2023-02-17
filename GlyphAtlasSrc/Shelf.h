@@ -1,20 +1,21 @@
 #pragma once
 
-#include "Math/Rect.h"
+#include "Rect.h"
+#include "Glyph.h"
 #include <vector>
 
 class Shelf
 {
 public:
-    Shelf(Rect& rectArg, const std::vector<ushort> widthDelimitersArg)
-    : rect(rectArg), widthDelimiters(widthDelimitersArg)
+    Shelf(Pair& pos, ushort width, Pair& minMaxHeightArg, const std::vector<ushort>& widthDelimitersArg)
+    : minMaxHeight(minMaxHeightArg), widthDelimiters(widthDelimitersArg)
     {
-        freeSlots = {rect};
+        freeSlots = {{pos.x, pos.y, width, minMaxHeightArg.y}};
     }
 
-    Rect rect;
+    Pair minMaxHeight; // used to not place too short inside shelf.
 
-    bool TryAdd(Rect& rect);
+    bool TryAdd(Glyph& glyph);
 private:
     std::vector<Rect> freeSlots;
     const std::vector<ushort> widthDelimiters;
