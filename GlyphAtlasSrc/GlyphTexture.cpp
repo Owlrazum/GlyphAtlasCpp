@@ -1,5 +1,7 @@
 #include "GlyphTexture.h"
 
+#include <algorithm>
+#include <iterator>
 //#include <cmath>
 
 void GlyphTexture::Initialize()//std::vector<Rect> &newRects, int idealAreaMultiplier)
@@ -43,24 +45,27 @@ void GlyphTexture::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
         {
             glyph.textureId = id;
             updateGlyphs.erase(updateGlyphs.begin() + i); // not using erase remove idiom to preserve the sort order
+            currentlyPlacedGlyphs.insert(glyphKey);
             i--;
             continue;
         }
 
-        bool found = FitInExistingSpot(glyph);
+        bool found = FitInExistingSpot(updateGlyph);
         if (found)
         {
             placedGlyphs.insert(std::make_pair(glyphKey, glyph));
             updateGlyphs.erase(updateGlyphs.begin() + i); // not using erase remove idiom to preserve the sort order
+            currentlyPlacedGlyphs.insert(glyphKey);
             i--;
             continue;
         }
 
-        bool shouldPlace = CreateShelf(glyph);
+        bool shouldPlace = CreateShelf(updateGlyph);
         if (shouldPlace)
         {
-            placedGlyphs.insert(std::make_pair(glyphKey, glyph));
+            placedGlyphs.insert(updateGlyph);
             updateGlyphs.erase(updateGlyphs.begin() + i); // not using erase remove idiom to preserve the sort order
+            currentlyPlacedGlyphs.insert(glyphKey);
             i--;
             continue;
         }
@@ -84,18 +89,22 @@ std::pair<std::vector<Rect>, std::vector<Rect>> GlyphTexture::GetFreeShelfSlotSp
     for (const Shelf & shelf : shelves)
     {
         auto shelfFreeSlots = shelf.GetFreeSlots();
-        freeSlots.insert(freeSlots.begin(), shelfFreeSlots.begin(), shelfFreeSlots.end());
+        for (auto freeSlotX : shelfFreeSlots)
+        {
+            assert(freeSlotX.y > freeSlotX.x);
+            freeSlots.emplace_back(freeSlotX.x, shelf.shelfPos.y, freeSlotX.y - freeSlotX.x, shelf.minMaxHeight.y);
+        }
     }
     return std::make_pair(freeShelves, freeSlots);
 }
 
 /// returns whether appropriate spot was found
-bool GlyphTexture::FitInExistingSpot(Glyph& glyph)
+bool GlyphTexture::FitInExistingSpot(std::pair<GlyphKey, Glyph>& glyph)
 {
     for (auto & shelf : shelves)
     {
-        ushort h = glyph.rect.h;
-        if (h >= shelf.minMaxHeight.x && h <= shelf.minMaxHeight.y) // let's assume that shelves are sorted by height, so the first match is correct
+        ushort h = glyph.second.rect.h;
+        if (h >= shelf.minMaxHeight.x && h <= shelf.minMaxHeight.y)
         {
             bool doesFit = shelf.TryAdd(glyph);
             if (doesFit)
@@ -110,13 +119,13 @@ bool GlyphTexture::FitInExistingSpot(Glyph& glyph)
 
 /// creates and adds shelfRect to the shelf
 // todod add several texture handling
-bool GlyphTexture::CreateShelf(Glyph& glyph)
+bool GlyphTexture::CreateShelf(std::pair<GlyphKey, Glyph> &glyph)
 {
     Pair shelfMinMaxHeight {0, 0};
     bool delimitersValid = false;
     for (int i = 1; i < shelfDelimiters.size(); i++)
     {
-        if (glyph.rect.h <= shelfDelimiters[i])
+        if (glyph.second.rect.h <= shelfDelimiters[i])
         {
             shelfMinMaxHeight.x = shelfDelimiters[i - 1];
             shelfMinMaxHeight.y = shelfDelimiters[i];
@@ -127,7 +136,7 @@ bool GlyphTexture::CreateShelf(Glyph& glyph)
 
     if (!delimitersValid)
     {
-        throw std::out_of_range("received delimiters for shelves are not big enough to contain the shelfRect: " + glyph.ToString());
+        throw std::out_of_range("received delimiters for shelves are not big enough to contain the shelfRect: " + glyph.second.ToString());
     }
 
     for (int i = 0; i < freeSpacesForShelves.size(); i++)
@@ -162,4 +171,35 @@ std::pair<Rect, Rect> GlyphTexture::SplitFreeSpace(Rect& freeSpace, ushort split
     Rect second {freeSpace.x, static_cast<ushort>(freeSpace.y + splitHeight),
                  freeSpace.w, static_cast<ushort>(freeSpace.h - splitHeight)};
     return std::make_pair(first, second);
+}
+
+void GlyphTexture::RemoveUnused()
+{
+    if (previouslyPlacedGlyphs.empty())
+    {
+        previouslyPlacedGlyphs = currentlyPlacedGlyphs;
+        currentlyPlacedGlyphs.clear();
+        return;
+    }
+
+    std::set<GlyphKey> unused;
+    std::set_difference(previouslyPlacedGlyphs.begin(), previouslyPlacedGlyphs.end(),
+                        currentlyPlacedGlyphs.begin(), currentlyPlacedGlyphs.end(),
+                        std::inserter(unused, unused.begin()));
+
+    previouslyPlacedGlyphs = currentlyPlacedGlyphs;
+    currentlyPlacedGlyphs.clear();
+
+    for (const auto& key : unused)
+    {
+        for (auto& shelf : shelves)
+        {
+            bool removed = shelf.TryRemove(key);
+            if (removed)
+            {
+                break;
+            }
+        }
+        placedGlyphs.erase(key);
+    }
 }

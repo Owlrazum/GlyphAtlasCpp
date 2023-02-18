@@ -14,7 +14,7 @@ Rect::Rect(const std::string& serialized)
 
 std::string Rect::ToString() const
 {
-    return "pos: " + std::to_string(x) + " " + std::to_string(y) + " size: " + std::to_string(w) + " " + std::to_string(h)+ "\n";
+    return "shelfPos: " + std::to_string(x) + " " + std::to_string(y) + " size: " + std::to_string(w) + " " + std::to_string(h)+ "\n";
 }
 
 Rect::Rect(ushort xArg, ushort yArg, ushort wArg, ushort hArg)

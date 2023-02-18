@@ -22,6 +22,11 @@ void GlyphAtlas::Update(const std::vector<GlyphKey> &keys)
 
         textureIndex++;
     }
+
+    for (auto & texture : textures)
+    {
+        texture.RemoveUnused();
+    }
 }
 
 bool GlyphAtlas::CompareByHeight(const std::pair<GlyphKey, Glyph> &lhs, const std::pair<GlyphKey, Glyph> &rhs)

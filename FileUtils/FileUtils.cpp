@@ -95,6 +95,28 @@ std::vector<GlyphKey> ReadGlyphKeys(const std::string &path)
     return data;
 }
 
+std::vector<std::vector<GlyphKey>> ReadGlyphKeysByLine(const std::string &path)
+{
+    std::ifstream in{path};
+    std::string line;
+    std::vector<std::vector<GlyphKey>> data;
+    while (std::getline(in, line))
+    {
+        std::istringstream ss{line};
+        ushort fontId;
+        ss >> fontId;
+        ushort glyphId;
+        std::vector<GlyphKey> lineGlyphs;
+        while (ss >> glyphId)
+        {
+            lineGlyphs.push_back({fontId, glyphId});
+        }
+        data.push_back(lineGlyphs);
+    }
+
+    return data;
+}
+
 std::vector<std::pair<GlyphKey, Glyph>> ReadGlyphs(const std::vector<GlyphKey>& keys)
 {
     std::vector<std::pair<GlyphKey, Glyph>> glyphs;

@@ -20,15 +20,18 @@ public:
             : shelfDelimiters(shelfDelimitersArg),
               widthDelimiters(widthDelimitersArg),
               dims(textureDims),
-              id(idArg)
+              id(idArg),
+              placedGlyphs(),
+              previouslyPlacedGlyphs(),
+              currentlyPlacedGlyphs(),
+              shelves(),
+              freeSpacesForShelves(),
+              isInitialized(false)
     {
-        placedGlyphs = std::map<GlyphKey, Glyph>();
-        shelves = std::vector<Shelf>();
-        freeSpacesForShelves = std::vector<Rect>();
-        isInitialized = false;
     }
 
     void Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
+    void RemoveUnused();
 
     [[nodiscard]] std::vector<std::pair<GlyphKey, Glyph>> GetGlyphs() const;
     [[nodiscard]] std::pair<std::vector<Rect>, std::vector<Rect>> GetFreeShelfSlotSpace() const; // the first vector is freeSpace for the shelves
@@ -42,7 +45,9 @@ private:
 
     // array of fonts, max 255 MAX_FONT_COUNT arg
     // glyphId - some structure
-    std::map<GlyphKey, Glyph> placedGlyphs;
+    std::map<GlyphKey, Glyph> placedGlyphs; // we need prev and cur, becuase placedGlyph is basically a mixture of both.
+    std::set<GlyphKey> previouslyPlacedGlyphs;
+    std::set<GlyphKey> currentlyPlacedGlyphs; // in other words, glyphs that were placed during this iteration.
     std::vector<Shelf> shelves;
     std::vector<Rect> freeSpacesForShelves;
 
@@ -51,13 +56,11 @@ private:
 
     [[nodiscard]] bool ContainsGlyph(const GlyphKey &glyphKey) const;
 
-    bool FitInExistingSpot(Glyph &glyph);
+    bool FitInExistingSpot(std::pair<GlyphKey, Glyph>& glyph);
 
-    bool CreateShelf(Glyph &glyph);
+    bool CreateShelf(std::pair<GlyphKey, Glyph> &glyph);
 
     static std::pair<Rect, Rect> SplitFreeSpace(Rect &freeSpace, ushort splitHeight);
-
-    static bool CompareByHeight(const Glyph &lhs, const Glyph &rhs);
 
     bool isInitialized;
 

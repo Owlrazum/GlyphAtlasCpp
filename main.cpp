@@ -5,7 +5,6 @@
 #include "GlyphAtlas.h"
 
 #include <vector>
-#include <iostream>
 
 // Generates files in TestData/ using the following conventions:
 // 1. font_x.txt mimics font by listing all rects one by one on each line
@@ -30,8 +29,11 @@ void GenerateTestCases(
 
 void Test(int caseNumber, GlyphAtlas &atlas)
 {
-    auto testCase = ReadGlyphKeys(GetDataPath(caseNumber));
-    atlas.Update(testCase);
+    auto testCase = ReadGlyphKeysByLine(GetDataPath(caseNumber));
+    for (const auto & keys : testCase)
+    {
+        atlas.Update(keys);
+    }
 
     std::cout << "completed test case " << caseNumber << std::endl;
 }
@@ -44,7 +46,7 @@ int main()
 
     const std::vector<ushort> heightDelimiters{8, 16, 24, 32, 40, 48, 56, 64};
     const std::vector<ushort> widthDelimiters{8, 16, 24, 32, 40, 48, 56, 64};
-    GlyphAtlas atlas{heightDelimiters, widthDelimiters, {2048, 2048}};
+    GlyphAtlas atlas{heightDelimiters, widthDelimiters, {512, 512}};
 
     Test(0, atlas);
 
@@ -52,3 +54,23 @@ int main()
     writer.WriteAtlas(atlas);
     return 0;
 }
+
+/*
+ * Useful test case demonstrating merging in two steps. See Shelf.cpp:91
+ * 0 1 2 3 4 5 6 7 8
+ * 0 1 2 3 4
+ *
+ *
+pos: 0 0 size: 30 27
+pos: 0 0 size: 56 45
+pos: 0 0 size: 28 33
+pos: 0 0 size: 27 41
+pos: 0 0 size: 35 49
+pos: 0 0 size: 27 33
+pos: 0 0 size: 20 18
+pos: 0 0 size: 56 32
+pos: 0 0 size: 17 37
+pos: 0 0 size: 11 34
+
+ *
+ */
