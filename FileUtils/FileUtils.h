@@ -11,9 +11,10 @@ std::string GetDataPath(int testNumber);
 std::string GetTexturePath(int textureId);
 void WriteRects(const std::string& path, const std::vector<Rect>& rects);
 void GenerateAndWriteGlyphKeys(
-        const std::string& path,
+        std::ofstream &out,
         int fontCount,
-        const std::vector<int>& glyphCounts);
+        int glyphCountInFont,
+        int keysCountInPass);
 std::vector<GlyphKey> ReadGlyphKeys(const std::string& path);
 std::vector<std::pair<GlyphKey, Glyph>> ReadGlyphs(const std::vector<GlyphKey>& keys);
 std::vector<std::vector<GlyphKey>> ReadGlyphKeysByLine(const std::string &path);

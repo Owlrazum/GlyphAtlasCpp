@@ -5,25 +5,34 @@
 #include "GlyphAtlas.h"
 
 #include <vector>
+#include <fstream>
+
+void GenerateFonts(
+        int fontCount,
+        int glyphCountInFont)
+{
+    for (int i = 0; i < fontCount; i++)
+    {
+        auto rects = GenerateRects(glyphCountInFont, {8, 64, 8, 64});
+        WriteRects(GetFontPath(i), rects);
+    }
+}
 
 // Generates files in TestData/ using the following conventions:
 // 1. font_x.txt mimics font by listing all rects one by one on each line
 // 2. test.x.txt lists lines each containing font index leading to font_x.txt file,
 // then a list of glyph indices inside that font leading to Rect
-void GenerateTestCases(
+void GenerateTestCase(
+        int testNumber,
+        int passCount,
         int fontCount,
-        const std::vector<int> &glyphCounts,
-        int testCount)
+        int glyphCountInFont,
+        int keysCountInPass)
 {
-    for (int i = 0; i < fontCount; i++)
+    std::ofstream out {GetDataPath(testNumber)};
+    for (int i = 0; i < passCount; i++)
     {
-        auto rects = GenerateRects(glyphCounts[i], {8, 64, 8, 64});
-        WriteRects(GetFontPath(i), rects);
-    }
-
-    for (int i = 0; i < testCount; i++)
-    {
-        GenerateAndWriteGlyphKeys(GetDataPath(i), fontCount, glyphCounts);
+        GenerateAndWriteGlyphKeys(out, fontCount, glyphCountInFont, keysCountInPass);
     }
 }
 
@@ -40,9 +49,8 @@ void Test(int caseNumber, GlyphAtlas &atlas)
 
 int main()
 {
-    const int FONT_COUNT = 10;
-    const std::vector<int> glyphCounts{10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
-//    GenerateTestCases(FONT_COUNT, glyphCounts, 2);
+//    GenerateFonts(3, 10);
+//    GenerateTestCase(0, 2, 3, 10, 5);
 
     const std::vector<ushort> heightDelimiters{8, 16, 24, 32, 40, 48, 56, 64};
     const std::vector<ushort> widthDelimiters{8, 16, 24, 32, 40, 48, 56, 64};

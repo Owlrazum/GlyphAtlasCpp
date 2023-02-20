@@ -27,52 +27,34 @@ std::string GetTexturePath(int textureId)
 void WriteRects(const std::string &path, const std::vector<Rect> &rects)
 {
     std::ofstream out{path};
-    for (Rect rect: rects)
+    for (int i = 0; i < rects.size(); i++)
     {
-        out << rect.ToString();
+        out << rects[i].ToString();
+        if (i != rects.size() - 1)
+        {
+            out << "\n";
+        }
     }
 }
 
 void GenerateAndWriteGlyphKeys(
-        const std::string &path,
+        std::ofstream &out,
         int fontCount,
-        const std::vector<int> &glyphCounts)
+        int glyphCountInFont,
+        int keysCountInPass)
 {
-    std::ofstream out{path};
-
     std::random_device rd; // obtain a random number from hardware
-    std::mt19937 gen(rd()); // seed the generator
-    std::uniform_int_distribution<> rndGenFontCount(0, fontCount);
+    std::default_random_engine gen(rd()); // seed the generator
+    std::uniform_int_distribution<> fontDistr(0, fontCount);
+    std::uniform_int_distribution<> glyphDistr(0, glyphCountInFont);
+    auto fontGen = std::bind(fontDistr, gen);
+    auto glyphGen = std::bind(glyphDistr, gen);
 
-    int rndFontCount = rndGenFontCount(gen);
-    std::vector<int> fonts;
-    for (int i = 0; i < fontCount; i++)
+    for (int i = 0; i < keysCountInPass; i++)
     {
-        fonts.push_back(i);
+        out << fontGen() << " " << glyphGen() << " ";
     }
-    std::shuffle(fonts.begin(), fonts.end(), gen);
-
-    for (int i = 0; i < rndFontCount; i++)
-    {
-        int rndFont = fonts[i];
-
-        std::vector<int> glyphs;
-        for (int g = 0; g < glyphCounts[rndFont]; g++)
-        {
-            glyphs.push_back(g);
-        }
-
-        std::shuffle(glyphs.begin(), glyphs.end(), gen);
-        std::uniform_int_distribution<> rndGenGlyphCount(0, glyphCounts[i]);
-        int rndGlyphCount = rndGenGlyphCount(gen);
-
-        out << rndFont;
-        for (int g = 0; g < rndGlyphCount; g++)
-        {
-            out << " " << glyphs[g];
-        }
-        out << std::endl;
-    }
+    out << "\n";
 }
 
 std::vector<GlyphKey> ReadGlyphKeys(const std::string &path)
@@ -100,18 +82,17 @@ std::vector<std::vector<GlyphKey>> ReadGlyphKeysByLine(const std::string &path)
     std::ifstream in{path};
     std::string line;
     std::vector<std::vector<GlyphKey>> data;
+    ushort fontId;
+    ushort glyphId;
     while (std::getline(in, line))
     {
         std::istringstream ss{line};
-        ushort fontId;
-        ss >> fontId;
-        ushort glyphId;
-        std::vector<GlyphKey> lineGlyphs;
-        while (ss >> glyphId)
+        std::vector<GlyphKey> lineKeys;
+        while(ss >> fontId >> glyphId)
         {
-            lineGlyphs.push_back({fontId, glyphId});
+            lineKeys.push_back({fontId, glyphId});
         }
-        data.push_back(lineGlyphs);
+        data.push_back(lineKeys);
     }
 
     return data;
@@ -140,3 +121,28 @@ std::vector<std::pair<GlyphKey, Glyph>> ReadGlyphs(const std::vector<GlyphKey>& 
 
     return glyphs;
 }
+
+
+/*
+ * std::vector<int> fonts (fontCount);
+    std::iota(fonts.begin(), fonts.end(), fontCount);
+
+    for (int i = 0; i < fontCount; i++)
+    {
+        int font = fonts[i];
+
+        std::vector<int> glyphs (glyphCounts[font]);
+        std::iota(glyphs.begin(), glyphs.end(), glyphCounts[font]);
+        std::shuffle(glyphs.begin(), glyphs.end(), gen);
+
+        std::uniform_int_distribution<> rndGenGlyphCount(0, glyphCounts[i]);
+        int rndGlyphCount = rndGenGlyphCount(gen);
+
+        out << font;
+        for (int g = 0; g < rndGlyphCount; g++)
+        {
+            out << " " << glyphs[g];
+        }
+        out << std::endl;
+    }
+ */

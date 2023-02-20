@@ -25,11 +25,12 @@ void SvgWriter::WriteAtlas(GlyphAtlas &atlas)
         auto freeRects = atlas.GetFreeShelfSlotSpace(i);
         std::ofstream out{GetTexturePath(i)};
         out << opening;
+        out << "\n";
         for (auto glyph: glyphs)
         {
-            WriteGlyphDefault(glyph, out, false);
+            WriteGlyphDefault(glyph, out, true);
         }
-
+        out << "\n";
         for (auto rect: freeRects.first)
         {
             WriteRect(rect, out, sandDollar, 1, oliveGreen);
@@ -38,6 +39,7 @@ void SvgWriter::WriteAtlas(GlyphAtlas &atlas)
         {
             WriteRect(rect, out, yellowGreen, 1, coolGray);
         }
+        out << "\n";
 
         out << svgClose;
     }
