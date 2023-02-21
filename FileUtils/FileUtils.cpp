@@ -52,9 +52,12 @@ void GenerateAndWriteGlyphKeys(
 
     for (int i = 0; i < keysCountInPass; i++)
     {
-        out << fontGen() << " " << glyphGen() << " ";
+        out << fontGen() << " " << glyphGen();
+        if (i != keysCountInPass - 1)
+        {
+            out << " ";
+        }
     }
-    out << "\n";
 }
 
 std::vector<GlyphKey> ReadGlyphKeys(const std::string &path)
@@ -116,6 +119,7 @@ std::vector<std::pair<GlyphKey, Glyph>> ReadGlyphs(const std::vector<GlyphKey>& 
             lineCounter++;
         }
         Glyph glyph (line);
+        assert(glyph.rect.w > 0 && glyph.rect.h > 0);
         glyphs.emplace_back(key, glyph);
     }
 

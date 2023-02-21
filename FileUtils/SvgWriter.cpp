@@ -33,7 +33,7 @@ void SvgWriter::WriteAtlas(GlyphAtlas &atlas)
         out << "\n";
         for (auto rect: freeRects.first)
         {
-            WriteRect(rect, out, sandDollar, 1, oliveGreen);
+            WriteRect(rect, out, tiffanyBlue, 1, oliveGreen);
         }
         for (auto rect: freeRects.second)
         {

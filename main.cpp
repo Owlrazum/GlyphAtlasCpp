@@ -33,6 +33,10 @@ void GenerateTestCase(
     for (int i = 0; i < passCount; i++)
     {
         GenerateAndWriteGlyphKeys(out, fontCount, glyphCountInFont, keysCountInPass);
+        if (i != passCount - 1)
+        {
+            out << "\n";
+        }
     }
 }
 
@@ -50,7 +54,7 @@ void Test(int caseNumber, GlyphAtlas &atlas)
 int main()
 {
 //    GenerateFonts(3, 100);
-//    GenerateTestCase(0, 2, 3, 10, 100);
+    GenerateTestCase(0, 2, 3, 100, 100);
 
     const std::vector<ushort> heightDelimiters{8, 16, 24, 32, 40, 48, 56, 64};
     const std::vector<ushort> widthDelimiters{8, 16, 24, 32, 40, 48, 56, 64};

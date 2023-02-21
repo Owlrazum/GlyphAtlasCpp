@@ -1,6 +1,7 @@
 #include "Shelf.h"
 
 #include "EndPoints.h"
+#include <iostream>
 
 /// Adds into a least possible slot
 bool Shelf::TryAdd(std::pair<GlyphKey, Glyph> &glyph, ushort slotWidth)
@@ -45,10 +46,6 @@ std::pair<bool, bool> Shelf::TryRemove(const GlyphKey &key)
         }
 
         Pair& newFreeSlot = search->second;
-        if (newFreeSlot.x == 32 && newFreeSlot.y == 216)
-        {
-            int breakpoint;
-        }
         assert(newFreeSlot.y > newFreeSlot.x);
         ClaimFreeSlot(newFreeSlot);
 

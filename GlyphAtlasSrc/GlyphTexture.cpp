@@ -3,6 +3,7 @@
 #include "EndPoints.h"
 #include <algorithm>
 #include <iterator>
+#include <iostream>
 //#include <cmath>
 
 void GlyphTexture::Initialize()//std::vector<Rect> &newRects, int idealAreaMultiplier)
@@ -36,7 +37,7 @@ std::pair<std::vector<Rect>, std::vector<Rect>> GlyphTexture::GetFreeShelfSlotSp
     std::vector<Rect> freeShelfRects (freeShelves.size());
     for (int i = 0; i < freeShelfRects.size(); i++)
     {
-        auto height = static_cast<ushort>(freeShelves[i].y + 1);
+        auto height = static_cast<ushort>(freeShelves[i].y - freeShelves[i].x + 1);
         freeShelfRects[i] = Rect {0, freeShelves[i].x, dims.x, height};
     }
 
@@ -46,7 +47,7 @@ std::pair<std::vector<Rect>, std::vector<Rect>> GlyphTexture::GetFreeShelfSlotSp
         auto shelfFreeSlots = shelf.GetFreeSlots();
         for (auto freeSlotX : shelfFreeSlots)
         {
-            freeSlots.emplace_back(freeSlotX.x, shelf.crossEndPoints.x, freeSlotX.y - freeSlotX.x - 1, shelf.minMaxSize.y);
+            freeSlots.emplace_back(freeSlotX.x, shelf.crossEndPoints.x, freeSlotX.y - freeSlotX.x + 1, shelf.minMaxSize.y);
         }
     }
     return std::make_pair(freeShelfRects, freeSlots);
@@ -167,7 +168,7 @@ bool GlyphTexture::CreateShelf(std::pair<GlyphKey, Glyph> &glyph, ushort slotWid
         if (shelfMinMaxHeight.y <= h)
         {
             Pair mainEndPointsArg {0, static_cast<ushort>(dims.x - 1)};
-            auto crossEnd = static_cast<ushort>(freeShelves[i].x + shelfMinMaxHeight.y);
+            auto crossEnd = static_cast<ushort>(freeShelves[i].x + shelfMinMaxHeight.y - 1);
             Pair crossEndPointsArg {freeShelves[i].x, crossEnd};
             Shelf created {mainEndPointsArg, crossEndPointsArg, shelfMinMaxHeight};
 
@@ -176,7 +177,7 @@ bool GlyphTexture::CreateShelf(std::pair<GlyphKey, Glyph> &glyph, ushort slotWid
             shelves.push_back(created);
 
             SplitFreeSpace(freeShelves[i], shelfMinMaxHeight.y); // updates freeSpaceForShelf.x, so it shrinks in size
-            if (freeShelves[i].y - freeShelves[i].x == 0)
+            if (freeShelves[i].y - freeShelves[i].x <= 0)
             {
                 freeShelves.erase(freeShelves.begin() + i);
             }
@@ -189,9 +190,8 @@ bool GlyphTexture::CreateShelf(std::pair<GlyphKey, Glyph> &glyph, ushort slotWid
 
 void GlyphTexture::SplitFreeSpace(Pair &freeShelf, ushort splitHeight)
 {
-    int occupiedY = freeShelf.x + splitHeight + 1;
-    assert(occupiedY >= 0); // if occupiedY equal to freeShelf.x, it is empty and should be deleted
-    freeShelf.x = occupiedY + 1;
+    int occupiedY = freeShelf.x + splitHeight;
+    freeShelf.x = occupiedY;
 }
 
 void GlyphTexture::RemoveUnused()

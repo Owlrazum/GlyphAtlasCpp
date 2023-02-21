@@ -25,12 +25,11 @@ bool MergeIntoIfPossible(Pair &toMerge, std::vector<Pair> &intoContainer)
     {
         if (isByX)
         {
-            for (int i = 0; i < intoContainer.size(); i++)
+            for (int i = mergedIndex + 1; i < intoContainer.size(); i++)
             {
                 if (abs(intoContainer[mergedIndex].y - intoContainer[i].x) == 1)
                 {
                     intoContainer[mergedIndex].y = intoContainer[i].y;
-                    //assert(intoContainer[mergedIndex].y > intoContainer[mergedIndex].x);
                     intoContainer.begin() + i = intoContainer.end() - 1; // swap and erase last
                     intoContainer.erase(intoContainer.end() - 1);
                     return true;
@@ -38,12 +37,11 @@ bool MergeIntoIfPossible(Pair &toMerge, std::vector<Pair> &intoContainer)
             }
         } else
         {
-            for (int i = 0; i < intoContainer.size(); i++)
+            for (int i = mergedIndex + 1; i < intoContainer.size(); i++)
             {
                 if (abs(intoContainer[mergedIndex].x - intoContainer[i].y) == 1)
                 {
                     intoContainer[mergedIndex].x = intoContainer[i].x;
-                    //assert(intoContainer[mergedIndex].y > intoContainer[mergedIndex].x);
                     intoContainer.begin() + i = intoContainer.end() - 1;
                     intoContainer.erase(intoContainer.end() - 1);
                     return true;
