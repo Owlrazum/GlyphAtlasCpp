@@ -4,6 +4,7 @@ typedef unsigned short ushort;
 
 struct Pair
 {
+    Pair(ushort xArg, ushort yArg) : x(xArg), y(yArg) {}
     ushort x;
     ushort y;
 };

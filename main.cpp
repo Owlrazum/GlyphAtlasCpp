@@ -49,8 +49,8 @@ void Test(int caseNumber, GlyphAtlas &atlas)
 
 int main()
 {
-//    GenerateFonts(3, 10);
-//    GenerateTestCase(0, 2, 3, 10, 5);
+//    GenerateFonts(3, 100);
+//    GenerateTestCase(0, 2, 3, 10, 100);
 
     const std::vector<ushort> heightDelimiters{8, 16, 24, 32, 40, 48, 56, 64};
     const std::vector<ushort> widthDelimiters{8, 16, 24, 32, 40, 48, 56, 64};

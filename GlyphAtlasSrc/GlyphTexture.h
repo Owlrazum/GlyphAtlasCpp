@@ -25,7 +25,7 @@ public:
               previouslyPlacedGlyphs(),
               currentlyPlacedGlyphs(),
               shelves(),
-              freeSpacesForShelves(),
+              freeShelves(),
               isInitialized(false)
     {
     }
@@ -40,28 +40,28 @@ public:
     { return id; }
 
 private:
-    Pair dims{};
+    Pair dims;
     ushort id;
 
-    // array of fonts, max 255 MAX_FONT_COUNT arg
-    // glyphId - some structure
+    std::vector<Shelf> shelves;
+    std::vector<Pair> freeShelves; // Pair.x - yMin pos, Pair.y - yMax pos
+
     std::map<GlyphKey, Glyph> placedGlyphs; // we need prev and cur, becuase placedGlyph is basically a mixture of both.
     std::set<GlyphKey> previouslyPlacedGlyphs;
     std::set<GlyphKey> currentlyPlacedGlyphs; // in other words, glyphs that were placed during this iteration.
-    std::vector<Shelf> shelves;
-    std::vector<Rect> freeSpacesForShelves;
 
     const std::vector<ushort> shelfDelimiters;
     const std::vector<ushort> widthDelimiters;
 
     [[nodiscard]] bool ContainsGlyph(const GlyphKey &glyphKey) const;
 
-    bool FitInExistingSpot(std::pair<GlyphKey, Glyph>& glyph);
+    bool FitInExistingSpot(std::pair<GlyphKey, Glyph> &glyph, ushort slotWidth);
 
-    bool CreateShelf(std::pair<GlyphKey, Glyph> &glyph);
+    bool CreateShelf(std::pair<GlyphKey, Glyph> &glyph, ushort slotWidth);
 
-    static std::pair<Rect, Rect> SplitFreeSpace(Rect &freeSpace, ushort splitHeight);
-
+    static void SplitFreeSpace(Pair &freeShelf, ushort splitHeight);
+    void RemoveShelf(std::vector<Shelf>::iterator shelfToRemove);
+    void ClaimFreeShelf(Pair &freeShelf);
     bool isInitialized;
 
     void Initialize();//std::vector<Rect> &newRects, int idealAreaMultiplier);
