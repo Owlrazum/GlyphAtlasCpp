@@ -45,8 +45,8 @@ void GenerateAndWriteGlyphKeys(
 {
     std::random_device rd; // obtain a random number from hardware
     std::default_random_engine gen(rd()); // seed the generator
-    std::uniform_int_distribution<> fontDistr(0, fontCount);
-    std::uniform_int_distribution<> glyphDistr(0, glyphCountInFont);
+    std::uniform_int_distribution<> fontDistr(0, fontCount - 1);
+    std::uniform_int_distribution<> glyphDistr(0, glyphCountInFont - 1);
     auto fontGen = std::bind(fontDistr, gen);
     auto glyphGen = std::bind(glyphDistr, gen);
 

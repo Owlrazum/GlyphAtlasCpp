@@ -54,11 +54,11 @@ void Test(int caseNumber, GlyphAtlas &atlas)
 int main()
 {
 //    GenerateFonts(3, 100);
-    GenerateTestCase(0, 2, 3, 100, 100);
+    GenerateTestCase(0, 2, 3, 100, 30);
 
-    const std::vector<ushort> heightDelimiters{8, 16, 24, 32, 40, 48, 56, 64};
-    const std::vector<ushort> widthDelimiters{8, 16, 24, 32, 40, 48, 56, 64};
-    GlyphAtlas atlas{heightDelimiters, widthDelimiters, {512, 512}};
+    const std::vector<ushort> shelfDelimiters{16, 32, 64};
+    const std::vector<ushort> slotDelimiters{8, 16, 24, 32, 40, 48, 56, 64};
+    GlyphAtlas atlas{shelfDelimiters, slotDelimiters, {512, 512}};
 
     Test(0, atlas);
 

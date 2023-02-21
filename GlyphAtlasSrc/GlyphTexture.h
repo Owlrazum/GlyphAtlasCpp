@@ -25,9 +25,9 @@ public:
               previouslyPlacedGlyphs(),
               currentlyPlacedGlyphs(),
               shelves(),
-              freeShelves(),
-              isInitialized(false)
+              freeShelves()
     {
+        freeShelves.emplace_back(0, dims.y - 1);
     }
 
     void Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
@@ -38,6 +38,8 @@ public:
 
     [[nodiscard]] ushort GetId() const
     { return id; }
+
+    bool Step(std::pair<GlyphKey, Glyph> toPlace);
 
 private:
     Pair dims;
@@ -62,7 +64,4 @@ private:
     static void SplitFreeSpace(Pair &freeShelf, ushort splitHeight);
     void RemoveShelf(std::vector<Shelf>::iterator shelfToRemove);
     void ClaimFreeShelf(Pair &freeShelf);
-    bool isInitialized;
-
-    void Initialize();//std::vector<Rect> &newRects, int idealAreaMultiplier);
 };

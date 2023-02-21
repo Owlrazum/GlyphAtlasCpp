@@ -6,21 +6,6 @@
 #include <iostream>
 //#include <cmath>
 
-void GlyphTexture::Initialize()//std::vector<Rect> &newRects, int idealAreaMultiplier)
-{
-//    int idealPackingArea = 0;
-//    for(Rect shelfRect : newRects)
-//    {
-//        idealPackingArea += shelfRect.GetArea();
-//    }
-//
-//    auto dim = static_cast<ushort>(sqrt(idealPackingArea * idealAreaMultiplier));
-//    dims = {std::min(dim, dims.x), std::min(dim, dims.y)};
-
-    freeShelves.emplace_back(0, dims.y - 1);
-    isInitialized = true;
-}
-
 std::vector<std::pair<GlyphKey, Glyph>> GlyphTexture::GetGlyphs() const
 {
     std::vector<std::pair<GlyphKey, Glyph>> toReturn;
@@ -65,11 +50,6 @@ bool GlyphTexture::ContainsGlyph(const GlyphKey &glyphKey) const
 /// Erases glyphs that are placed from glyphs argument;
 void GlyphTexture::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
 {
-    if (!isInitialized)
-    {
-        Initialize();
-    }
-
     for(int i = 0; i < updateGlyphs.size(); i++)
     {
         auto updateGlyph = updateGlyphs[i];
@@ -102,15 +82,15 @@ void GlyphTexture::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
         bool found = FitInExistingSpot(updateGlyph, slotWidth);
         if (found)
         {
-            placedGlyphs.insert(std::make_pair(glyphKey, glyph));
+            placedGlyphs.insert(updateGlyph);
             updateGlyphs.erase(updateGlyphs.begin() + i); // not using erase remove idiom to preserve the sort order
             currentlyPlacedGlyphs.insert(glyphKey);
             i--;
             continue;
         }
 
-        bool shouldPlace = CreateShelf(updateGlyph, slotWidth);
-        if (shouldPlace)
+        bool wasPlaced = CreateShelf(updateGlyph, slotWidth);
+        if (wasPlaced)
         {
             placedGlyphs.insert(updateGlyph);
             updateGlyphs.erase(updateGlyphs.begin() + i); // not using erase remove idiom to preserve the sort order
@@ -140,27 +120,42 @@ bool GlyphTexture::FitInExistingSpot(std::pair<GlyphKey, Glyph> &glyph, ushort s
     return false;
 }
 
+Pair GetShelfMinMaxHeight(ushort h, const std::vector<ushort>& delimiters)
+{
+    if (h <= delimiters[0])
+    {
+        return {0, delimiters[0]};
+    }
+    else
+    {
+        Pair shelfMinMaxHeight {0, 0};
+        bool delimitersValid = false;
+
+        for (int i = 1; i < delimiters.size(); i++)
+        {
+            if (h <= delimiters[i])
+            {
+                shelfMinMaxHeight.x = delimiters[i - 1];
+                shelfMinMaxHeight.y = delimiters[i];
+                delimitersValid = true;
+                break;
+            }
+        }
+
+        if (!delimitersValid)
+        {
+            throw std::out_of_range("received delimiters for shelves are not big enough to contain the shelfRect: " + std::to_string(h));
+        }
+
+        return shelfMinMaxHeight;
+    }
+}
+
 /// creates and adds shelfRect to the shelf
 // todod add several texture handling
 bool GlyphTexture::CreateShelf(std::pair<GlyphKey, Glyph> &glyph, ushort slotWidth)
 {
-    Pair shelfMinMaxHeight {0, 0};
-    bool delimitersValid = false;
-    for (int i = 1; i < shelfDelimiters.size(); i++)
-    {
-        if (glyph.second.rect.h <= shelfDelimiters[i])
-        {
-            shelfMinMaxHeight.x = shelfDelimiters[i - 1];
-            shelfMinMaxHeight.y = shelfDelimiters[i];
-            delimitersValid = true;
-            break;
-        }
-    }
-
-    if (!delimitersValid)
-    {
-        throw std::out_of_range("received delimiters for shelves are not big enough to contain the shelfRect: " + glyph.second.ToString());
-    }
+    auto shelfMinMaxHeight = GetShelfMinMaxHeight(glyph.second.rect.h, shelfDelimiters);
 
     for (int i = 0; i < freeShelves.size(); i++)
     {
@@ -227,6 +222,8 @@ void GlyphTexture::RemoveUnused()
         }
         placedGlyphs.erase(key);
     }
+
+    std::cout << "BAM!" << "\n";
 }
 
 void GlyphTexture::RemoveShelf(std::vector<Shelf>::iterator shelfToRemove)
@@ -242,4 +239,49 @@ void GlyphTexture::ClaimFreeShelf(Pair &freeShelf)
     {
         freeShelves.push_back(freeShelf);
     }
+}
+
+bool GlyphTexture::Step(std::pair<GlyphKey, Glyph> toPlace)
+{
+    GlyphKey &glyphKey = toPlace.first;
+    Glyph &glyph = toPlace.second;
+
+    ushort slotWidth = 0;
+    for (ushort widthDelimiter : widthDelimiters)
+    {
+        if (glyph.rect.w <= widthDelimiter)
+        {
+            slotWidth = widthDelimiter;
+            break;
+        }
+    }
+    if (slotWidth == 0)
+    {
+        throw std::out_of_range("The shelfRect width too large to fit into just created shelf");
+    }
+
+    if (ContainsGlyph(glyphKey))
+    {
+        glyph.textureId = id;
+        currentlyPlacedGlyphs.insert(glyphKey);
+        return true;
+    }
+
+    bool found = FitInExistingSpot(toPlace, slotWidth);
+    if (found)
+    {
+        placedGlyphs.insert(toPlace);
+        currentlyPlacedGlyphs.insert(glyphKey);
+        return true;
+    }
+
+    bool wasPlaced = CreateShelf(toPlace, slotWidth);
+    if (wasPlaced)
+    {
+        placedGlyphs.insert(toPlace);
+        currentlyPlacedGlyphs.insert(glyphKey);
+        return true;
+    }
+
+    return false;
 }

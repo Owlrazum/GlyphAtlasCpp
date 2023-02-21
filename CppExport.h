@@ -13,6 +13,3 @@
 # endif
 
 #define DLLEXPORT TE_DECLSPEC
-
-//extern "C" DLLEXPORT
-//void SomeMethod(int * pValue) { ... }

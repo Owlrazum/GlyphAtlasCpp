@@ -14,41 +14,46 @@ class GlyphAtlas
 public:
     GlyphAtlas(
             const std::vector<ushort> &shelfDelimitersArg,
-            const std::vector<ushort> &widthDelimitersArg,
+            const std::vector<ushort> &slotDelimiters,
             Pair textureMaxDimsArg)
             : shelfDelimiters(shelfDelimitersArg),
-              widthDelimiters(widthDelimitersArg),
+              slotDelimiters(slotDelimiters),
               textureMaxDims(textureMaxDimsArg)
     {
         textures = std::vector<GlyphTexture>();
     };
 
+// ---- Stepped version: ----
+
+    int InitPass(const std::vector<GlyphKey> &keys);
+    int Step();
+
+// ---- SvgWriting: ----
+
     void Update(const std::vector<GlyphKey> &keys);
-//    GlyphHandle GetGlyph(FontKey key, GlyphId id);
 
     [[nodiscard]] const std::vector<std::pair<GlyphKey, Glyph>> GetGlyphsFromTexture(int textureId) const;
 
-    [[nodiscard]] const std::pair<std::vector<Rect>, std::vector<Rect>> GetFreeShelfSlotSpace(int textureId) const; // the first vector is freeSpace for the shelves
+    [[nodiscard]] const std::pair<std::vector<Rect>, std::vector<Rect>>
+    GetFreeShelfSlotSpace(int textureId) const; // the first vector is freeSpace for the shelves
 
     int GetTextureCount()
     {
         return static_cast<int>(textures.size());
     }
 
-    Pair GetTextureMaxDims()
-    {
-        return textureMaxDims;
-    }
-
 private:
-    Pair textureMaxDims;
+    // ---- Stepped version ----
+    int stepIndex;
+    std::vector<std::pair<GlyphKey, Glyph>> queue;
 
-    int texturesCount{};
+    // ---- SvgWriting ----
+    Pair textureMaxDims;
 
     std::vector<GlyphTexture> textures; // perhaps one glyphTexture can be referenced by multiple fonts
 
     const std::vector<ushort> shelfDelimiters;
-    const std::vector<ushort> widthDelimiters;
+    const std::vector<ushort> slotDelimiters;
 
     static bool CompareByHeight(const std::pair<GlyphKey, Glyph> &lhs, const std::pair<GlyphKey, Glyph> &rhs);
 };
