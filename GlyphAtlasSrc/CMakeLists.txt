@@ -4,6 +4,7 @@ target_sources(GlyphAtlas
                Shelf.cpp
                GlyphTexture.cpp
                )
+target_include_directories(GlyphAtlas PRIVATE . Glyph)
 
 target_sources(GlyphAtlasLib
                PRIVATE
@@ -11,3 +12,4 @@ target_sources(GlyphAtlasLib
                Shelf.cpp
                GlyphTexture.cpp
                )
+target_include_directories(GlyphAtlasLib PRIVATE . Glyph)

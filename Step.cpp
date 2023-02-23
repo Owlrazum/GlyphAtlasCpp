@@ -4,7 +4,7 @@
 
 #include <vector>
 
-GlyphAtlas glyphAtlas = GlyphAtlas({16, 32, 64}, {8, 16, 24, 32, 40, 48, 56, 64}, {512, 512});
+GlyphAtlas glyphAtlas = GlyphAtlas({64, 96, 128}, {64, 84, 100, 128}, {512, 512});
 
 // the containers are flushed after each step.
 std::vector<std::vector<GlyphKey>> passKeysByTestNumber {};
@@ -67,19 +67,19 @@ extern "C"
         return {
             static_cast<int>(placedGlyphsByTexture[textureId].size()),
             static_cast<int>(freeShelvesByTexture[textureId].size()),
-            static_cast<int>(freeShelvesByTexture[textureId].size())
+            static_cast<int>(freeSlotsByTexture[textureId].size())
         };
     }
 
-    DLLEXPORT Rect GetPlacedGlyph(int textureId, int glyphIndex)
+    DLLEXPORT CRect GetPlacedGlyph(int textureId, int glyphIndex)
     {
         return placedGlyphsByTexture[textureId][glyphIndex].rect;
     }
-    DLLEXPORT Rect GetFreeShelfRect(int textureId, int freeShelfIndex)
+    DLLEXPORT CRect GetFreeShelfRect(int textureId, int freeShelfIndex)
     {
         return freeShelvesByTexture[textureId][freeShelfIndex];
     }
-    DLLEXPORT Rect GetFreeSlotRect(int textureId, int freeSlotIndex)
+    DLLEXPORT CRect GetFreeSlotRect(int textureId, int freeSlotIndex)
     {
         return freeSlotsByTexture[textureId][freeSlotIndex];
     }

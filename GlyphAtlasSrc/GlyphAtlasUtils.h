@@ -1,6 +1,5 @@
 #pragma once
 
-#include "GlyphAtlas.h"
 #include "SvgWriter.h"
 #include "Colors.h"
 

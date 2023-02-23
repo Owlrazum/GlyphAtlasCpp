@@ -13,7 +13,7 @@ void GenerateFonts(
 {
     for (int i = 0; i < fontCount; i++)
     {
-        auto rects = GenerateRects(glyphCountInFont, {8, 64, 8, 64});
+        auto rects = GenerateRects(glyphCountInFont, {64, 128, 64, 128});
         WriteRects(GetFontPath(i), rects);
     }
 }
@@ -53,12 +53,12 @@ void Test(int caseNumber, GlyphAtlas &atlas)
 
 int main()
 {
-//    GenerateFonts(3, 100);
-    GenerateTestCase(0, 2, 3, 100, 30);
+//    GenerateFonts(3, 10);
+//    GenerateTestCase(0, 1, 3, 10, 3);
 
-    const std::vector<ushort> shelfDelimiters{16, 32, 64};
-    const std::vector<ushort> slotDelimiters{8, 16, 24, 32, 40, 48, 56, 64};
-    GlyphAtlas atlas{shelfDelimiters, slotDelimiters, {512, 512}};
+    const std::vector<ushort> shelfDelimiters{64, 96, 128};
+    const std::vector<ushort> slotDelimiters{64, 84, 100, 128};
+    GlyphAtlas atlas{shelfDelimiters, slotDelimiters, {1024, 1024}};
 
     Test(0, atlas);
 

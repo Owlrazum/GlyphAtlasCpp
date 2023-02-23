@@ -2,13 +2,17 @@ cmake_minimum_required(VERSION 3.24)
 project(GlyphAtlas)
 
 set(CMAKE_CXX_STANDARD 17)
-include_directories(GlyphAtlasSrc FileUtils GlyphAtlasSrc/Glyph Math ${CMAKE_SOURCE_DIR})
+include_directories(FreeType FreeType/LibraryInclude FreeType/LibraryInclude/freetype)
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 add_executable(GlyphAtlas main.cpp)
+add_executable(FreeTypeTest FreeTypeTest.cpp)
 add_library(GlyphAtlasLib SHARED Step.cpp)
 
 add_subdirectory(GlyphAtlasSrc)
 add_subdirectory(FileUtils)
 add_subdirectory(Math)
+add_subdirectory(FreeType)
 
 #set_target_properties(GlyphAtlasSrc PROPERTIES BUNDLE TRUE)

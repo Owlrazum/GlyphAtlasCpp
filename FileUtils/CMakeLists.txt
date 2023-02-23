@@ -3,8 +3,10 @@ target_sources(GlyphAtlas
                SvgWriter.cpp
                FileUtils.cpp
                )
+target_include_directories(GlyphAtlas PRIVATE .)
 
 target_sources(GlyphAtlasLib
                PRIVATE
                FileUtils.cpp
                )
+target_include_directories(GlyphAtlasLib PRIVATE .)

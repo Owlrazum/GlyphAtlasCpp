@@ -5,22 +5,22 @@
 
 std::string GetFontPath(int fontId)
 {
-    std::string path = "../TestData/font_.txt";
-    path.insert(17, std::to_string(fontId));
+    std::string path = "/Users/Abai/Desktop/Evolve/GlyphAtlas/TestData/font_.txt";
+    path.insert(52, std::to_string(fontId));
     return path;
 }
 
 std::string GetDataPath(int testNumber)
 {
-    std::string path = "../TestData/test_.txt";
-    path.insert(17, std::to_string(testNumber));
+    std::string path = "/Users/Abai/Desktop/Evolve/GlyphAtlas/TestData/test_.txt";
+    path.insert(52, std::to_string(testNumber));
     return path;
 }
 
 std::string GetTexturePath(int textureId)
 {
-    std::string path = "../ResultTextures/texture_.svg";
-    path.insert(26, std::to_string(textureId));
+    std::string path = "/Users/Abai/Desktop/Evolve/GlyphAtlas/ResultTextures/texture_.svg";
+    path.insert(61, std::to_string(textureId));
     return path;
 }
 
