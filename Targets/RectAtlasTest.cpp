@@ -42,6 +42,7 @@ extern "C"
         {
             auto textureGlyphPairs = glyphAtlas.GetGlyphsFromTexture(i);
             std::vector<Glyph> textureGlyphs;
+            auto data = textureGlyphs.data();
             for (auto pair : textureGlyphPairs)
             {
                 textureGlyphs.push_back(pair.second);

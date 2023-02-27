@@ -1,15 +1,23 @@
-target_sources(GlyphAtlas
+target_sources(TestGenerator
                PRIVATE
                GlyphAtlas.cpp
                Shelf.cpp
                GlyphTexture.cpp
                )
-target_include_directories(GlyphAtlas PRIVATE . Glyph)
+target_include_directories(RectAtlasTest PRIVATE . Glyph)
 
-target_sources(GlyphAtlasLib
+target_sources(RectAtlasTest
                PRIVATE
                GlyphAtlas.cpp
                Shelf.cpp
                GlyphTexture.cpp
                )
-target_include_directories(GlyphAtlasLib PRIVATE . Glyph)
+target_include_directories(RectAtlasTest PRIVATE . Glyph)
+
+target_sources(GlyphAtlasTest
+               PRIVATE
+               GlyphAtlas.cpp
+               Shelf.cpp
+               GlyphTexture.cpp
+               )
+target_include_directories(GlyphAtlasTest PRIVATE . Glyph)

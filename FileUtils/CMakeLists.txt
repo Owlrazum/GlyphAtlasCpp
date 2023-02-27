@@ -1,12 +1,18 @@
-target_sources(GlyphAtlas
+target_sources(TestGenerator
                PRIVATE
                SvgWriter.cpp
                FileUtils.cpp
                )
-target_include_directories(GlyphAtlas PRIVATE .)
+target_include_directories(RectAtlasTest PRIVATE .)
 
-target_sources(GlyphAtlasLib
+target_sources(RectAtlasTest
                PRIVATE
                FileUtils.cpp
                )
-target_include_directories(GlyphAtlasLib PRIVATE .)
+target_include_directories(RectAtlasTest PRIVATE .)
+
+target_sources(GlyphAtlasTest
+               PRIVATE
+               FileUtils.cpp
+               )
+target_include_directories(GlyphAtlasTest PRIVATE .)

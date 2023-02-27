@@ -6,9 +6,10 @@ include_directories(FreeType FreeType/LibraryInclude FreeType/LibraryInclude/fre
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
-add_executable(GlyphAtlas main.cpp)
-add_executable(FreeTypeTest FreeTypeTest.cpp)
-add_library(GlyphAtlasLib SHARED Step.cpp)
+add_executable(TestGenerator Targets/TestGenerator.cpp)
+add_library(FreeTypeTest SHARED Targets/FreeTypeTest.cpp)
+add_library(RectAtlasTest SHARED Targets/RectAtlasTest.cpp)
+add_library(GlyphAtlasTest SHARED Targets/GlyphAtlasTest.cpp)
 
 add_subdirectory(GlyphAtlasSrc)
 add_subdirectory(FileUtils)

@@ -62,8 +62,8 @@ int main()
 
     Test(0, atlas);
 
-    SvgWriter writer (whiteBack);
-    writer.WriteAtlas(atlas);
+//    SvgWriter writer (whiteBack);
+//    writer.WriteAtlas(atlas);
     return 0;
 }
 
