@@ -4,6 +4,7 @@
 #include "Shelf.h"
 #include "Glyph.h"
 #include "GlyphKey.h"
+#include "FreeTypeWrapper.h"
 
 #include <vector>
 #include <locale>
@@ -20,18 +21,19 @@ public:
             : shelfDelimiters(shelfDelimitersArg),
               widthDelimiters(widthDelimitersArg),
               dims(textureDims),
-              id(idArg),
-              placedGlyphs(),
-              previouslyPlacedGlyphs(),
-              currentlyPlacedGlyphs(),
-              shelves(),
-              freeShelves()
+              id(idArg)//,
     {
         freeShelves.emplace_back(0, dims.y - 1);
     }
 
+    void Render(FreeTypeWrapper& freeType);
     void Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
     void RemoveUnused();
+
+    unsigned char* GetRawBuffer()
+    {
+        return textureBuffer.data();
+    }
 
     [[nodiscard]] bool ContainsGlyph(const GlyphKey &key) const
     {
@@ -50,7 +52,7 @@ public:
         return static_cast<int>(placedGlyphs.size());
     }
 
-    [[nodiscard]] std::vector<std::pair<GlyphKey, Glyph>> GetGlyphs() const;
+    [[nodiscard]] std::map<GlyphKey, Glyph>& GetGlyphs();
     [[nodiscard]] std::pair<std::vector<Rect>, std::vector<Rect>> GetFreeShelfSlotSpace() const; // the first vector is freeSpace for the shelves
 
     [[nodiscard]] ushort GetId() const
@@ -61,10 +63,12 @@ private:
     Pair dims;
     ushort id;
 
+    std::vector<unsigned char> textureBuffer;
+
     std::vector<Shelf> shelves;
     std::vector<Pair> freeShelves; // Pair.x - yMin pos, Pair.y - yMax pos
 
-    std::map<GlyphKey, Glyph> placedGlyphs; // we need prev and cur, becuase placedGlyph is basically a mixture of both.
+    std::map<GlyphKey, Glyph> placedGlyphs; // we need prev and cur, because placedGlyph is basically a mixture of both.
     std::set<GlyphKey> previouslyPlacedGlyphs;
     std::set<GlyphKey> currentlyPlacedGlyphs; // in other words, glyphs that were placed during this iteration.
 

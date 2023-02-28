@@ -48,7 +48,7 @@ void FreeTypeWrapper::AddFont(FontKey fontKey)
     facesByFont.insert(std::make_pair(fontKey, newFace));
 }
 
-FT_Bitmap FreeTypeWrapper::RenderChar(FontKey fontKey, char character)
+FT_Bitmap FreeTypeWrapper::RenderChar(const FontKey &fontKey, char character)
 {
     if (auto search = facesByFont.find(fontKey); search != facesByFont.end())
     {
@@ -63,7 +63,7 @@ FT_Bitmap FreeTypeWrapper::RenderChar(FontKey fontKey, char character)
     throw std::out_of_range("The font key was not added");
 }
 
-FT_Bitmap FreeTypeWrapper::RenderGlyph(FontKey fontKey, int glyphIndex)
+FT_Bitmap FreeTypeWrapper::RenderGlyph(const FontKey &fontKey, int glyphIndex)
 {
     if (auto search = facesByFont.find(fontKey); search != facesByFont.end())
     {
@@ -76,6 +76,12 @@ FT_Bitmap FreeTypeWrapper::RenderGlyph(FontKey fontKey, int glyphIndex)
     }
 
     throw std::out_of_range("The font key was not added");
+}
+
+FT_Bitmap FreeTypeWrapper::RenderGlyph(const GlyphKey& glyphKey)
+{
+    FontKey fontKey {glyphKey.fontIndex, 0, defaultFontSize};
+    return RenderGlyph(fontKey, glyphKey.glyphIndex);
 }
 
 FreeTypeWrapper::~FreeTypeWrapper()

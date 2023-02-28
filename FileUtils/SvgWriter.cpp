@@ -18,7 +18,7 @@ SvgWriter::SvgWriter(const std::string &backColor)
 
 void SvgWriter::WriteAtlas(GlyphAtlas &atlas)
 {
-    auto size = atlas.GetTextureCount();
+    auto size = atlas.GetTexturesCount();
     for (int i = 0; i < size; i++)
     {
         auto glyphs = atlas.GetGlyphsFromTexture(i);

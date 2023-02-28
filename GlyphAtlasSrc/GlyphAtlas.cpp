@@ -3,23 +3,26 @@
 
 #include <iostream>
 
-// todo: improve by developing an algorithm for determining delimiters
-void GlyphAtlas::UpdateDelimiters(const std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
+// Currently renders and discards buffer.
+// todo: try to improve performance by finding freetype function to compute bbox
+void GlyphAtlas::InitGlyphDims(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
 {
-    if (shelfDelimiters.size() == 0 || slotDelimiters.size() == 0)
+    for (auto& pair : updateGlyphs)
     {
-        shelfDelimiters = {};
-        slotDelimiters = {};
+        auto bitmap = freeTypeWrapper.RenderGlyph(pair.first);
+        pair.second.rect.w = bitmap.pitch;
+        pair.second.rect.h = bitmap.rows;
     }
 }
 
-void GlyphAtlas::Update(std::vector<std::pair<GlyphKey, Glyph>> updateGlyphs)
+
+void GlyphAtlas::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
 {
     std::sort(updateGlyphs.begin(), updateGlyphs.end(), CompareByHeight);
     UpdateDelimiters(updateGlyphs);
 
     int textureIndex = 0;
-    while (updateGlyphs.size() > 0)
+    while (!updateGlyphs.empty())
     {
         if (textureIndex == textures.size())
         {
@@ -39,6 +42,24 @@ void GlyphAtlas::Update(std::vector<std::pair<GlyphKey, Glyph>> updateGlyphs)
     }
 }
 
+// todo: improve by developing an algorithm for determining delimiters
+void GlyphAtlas::UpdateDelimiters(const std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
+{
+    if (shelfDelimiters.empty() || slotDelimiters.empty() == 0)
+    {
+        shelfDelimiters = {16, 32, 64};
+        slotDelimiters = {16, 32, 48, 64};
+    }
+}
+
+void GlyphAtlas::Render()
+{
+    for (auto& texture : textures)
+    {
+        texture.Render(freeTypeWrapper);
+    }
+}
+
 Glyph GlyphAtlas::GetGlyph(GlyphKey key)
 {
     Glyph glyph;
@@ -53,9 +74,9 @@ Glyph GlyphAtlas::GetGlyph(GlyphKey key)
     throw std::out_of_range("The GlyphKey does not exists in the atlas!");
 }
 
-void GlyphAtlas::InitPass(const std::vector<GlyphKey> &keys)
+void GlyphAtlas::InitPass(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
 {
-    queue = ReadGlyphs(keys);
+    ReadGlyphs(updateGlyphs);
     std::sort(queue.begin(), queue.end(), CompareByHeight);
     UpdateDelimiters(queue);
     stepIndex = 0;
@@ -65,7 +86,7 @@ int GlyphAtlas::Step()
 {
     auto toStep = queue[stepIndex];
     int textureIndex = 0;
-    bool wasPlaced = false;
+    bool wasPlaced;
     do
     {
         if (textureIndex == textures.size())
@@ -83,8 +104,35 @@ int GlyphAtlas::Step()
     return static_cast<int> (textures.size());
 }
 
-void GlyphAtlas::Update(const std::vector<GlyphKey> &keys)
+bool GlyphAtlas::ContainsGlyph(const GlyphKey &key) const
 {
-    std::vector<std::pair<GlyphKey, Glyph>> updateGlyphs = ReadGlyphs(keys);
-    Update(updateGlyphs);
+    if (std::any_of(textures.begin(), textures.end(),
+                    [key](const GlyphTexture& t){ return t.ContainsGlyph(key); }))
+    {
+        return true;
+    }
+    return false;
+}
+
+bool GlyphAtlas::MarkIfContainsGlyph(const GlyphKey &key)
+{
+    for (auto texture : textures)
+    {
+        if (texture.ContainsGlyph(key))
+        {
+            texture.MarkGlyph(key);
+            return true;
+        }
+    }
+    return false;
+}
+
+int GlyphAtlas::GetPlacedGlyphsCount() const
+{
+    int placedGlyphsCount = 0;
+    for (auto t : textures)
+    {
+        placedGlyphsCount += t.GetGlyphCount();
+    }
+    return placedGlyphsCount;
 }

@@ -27,9 +27,9 @@ int main()
 //    GenerateFonts(3, 10);
 //    GenerateTestCase(0, 1, 3, 10, 3);
 
-    const std::vector<ushort> shelfDelimiters{64, 96, 128};
-    const std::vector<ushort> slotDelimiters{64, 84, 100, 128};
-    GlyphAtlas atlas{shelfDelimiters, slotDelimiters, {1024, 1024}};
+//    const std::vector<ushort> shelfDelimiters{64, 96, 128};
+//    const std::vector<ushort> slotDelimiters{64, 84, 100, 128};
+    GlyphAtlas atlas{{1024, 1024}};
 
     Test(0, atlas);
 
@@ -68,7 +68,7 @@ void GenerateTestCase(
 void Test(int caseNumber, GlyphAtlas &atlas)
 {
     auto testCase = ReadGlyphKeysByLine(GetTestGlyphKeysPath(caseNumber));
-    for (const auto & keys : testCase)
+    for (auto& keys : testCase)
     {
         atlas.Update(keys);
     }

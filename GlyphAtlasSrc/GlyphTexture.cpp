@@ -5,45 +5,22 @@
 #include <iterator>
 #include <iostream>
 
-bool GlyphTexture::GetGlyph(GlyphKey key, Glyph &glyph)
+void GlyphTexture::Render(FreeTypeWrapper &freeType)
 {
-    if (auto search = placedGlyphs.find(key); search != placedGlyphs.end())
+    for (const auto& glyph : placedGlyphs)
     {
-        glyph = search->second;
-        return true;
-    }
-}
-
-std::vector<std::pair<GlyphKey, Glyph>> GlyphTexture::GetGlyphs() const
-{
-    std::vector<std::pair<GlyphKey, Glyph>> toReturn;
-    for (const auto& placedGlyph : placedGlyphs)
-    {
-        toReturn.emplace_back(placedGlyph);
-    }
-    return toReturn;
-}
-
-
-std::pair<std::vector<Rect>, std::vector<Rect>> GlyphTexture::GetFreeShelfSlotSpace() const
-{
-    std::vector<Rect> freeShelfRects (freeShelves.size());
-    for (int i = 0; i < freeShelfRects.size(); i++)
-    {
-        auto height = static_cast<ushort>(freeShelves[i].y - freeShelves[i].x + 1);
-        freeShelfRects[i] = Rect {0, freeShelves[i].x, dims.x, height};
-    }
-
-    std::vector<Rect> freeSlots;
-    for (const Shelf & shelf : shelves)
-    {
-        auto shelfFreeSlots = shelf.GetFreeSlots();
-        for (auto freeSlotX : shelfFreeSlots)
+        auto bitmap = freeType.RenderGlyph(glyph.first);
+        for (int i = 0; i < bitmap.rows; i++)
         {
-            freeSlots.emplace_back(freeSlotX.x, shelf.crossEndPoints.x, freeSlotX.y - freeSlotX.x + 1, shelf.minMaxSize.y);
+            auto rowStart = bitmap.buffer + i * bitmap.pitch;
+            auto rowEnd = rowStart + bitmap.pitch;
+
+            Pair pos = {glyph.second.rect.x, glyph.second.rect.y};
+            auto dest = textureBuffer.begin() + pos.y * dims.x + pos.x;
+
+            std::copy(rowStart, rowEnd, dest);
         }
     }
-    return std::make_pair(freeShelfRects, freeSlots);
 }
 
 /// Erases glyphs that are placed from glyphs argument;
@@ -283,4 +260,41 @@ bool GlyphTexture::Step(std::pair<GlyphKey, Glyph> toPlace)
     }
 
     return false;
+}
+
+bool GlyphTexture::GetGlyph(GlyphKey key, Glyph &glyph)
+{
+    if (auto search = placedGlyphs.find(key); search != placedGlyphs.end())
+    {
+        glyph = search->second;
+        return true;
+    }
+
+    return false;
+}
+
+std::map<GlyphKey, Glyph>& GlyphTexture::GetGlyphs()
+{
+    return placedGlyphs;
+}
+
+std::pair<std::vector<Rect>, std::vector<Rect>> GlyphTexture::GetFreeShelfSlotSpace() const
+{
+    std::vector<Rect> freeShelfRects (freeShelves.size());
+    for (int i = 0; i < freeShelfRects.size(); i++)
+    {
+        auto height = static_cast<ushort>(freeShelves[i].y - freeShelves[i].x + 1);
+        freeShelfRects[i] = Rect {0, freeShelves[i].x, dims.x, height};
+    }
+
+    std::vector<Rect> freeSlots;
+    for (const Shelf & shelf : shelves)
+    {
+        auto shelfFreeSlots = shelf.GetFreeSlots();
+        for (auto freeSlotX : shelfFreeSlots)
+        {
+            freeSlots.emplace_back(freeSlotX.x, shelf.crossEndPoints.x, freeSlotX.y - freeSlotX.x + 1, shelf.minMaxSize.y);
+        }
+    }
+    return std::make_pair(freeShelfRects, freeSlots);
 }

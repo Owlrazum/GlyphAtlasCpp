@@ -19,9 +19,8 @@
 
 
 // 1) Remove already contained from the input queue
-// 2) Figure if existing textures can contain all of the input queue
-//    a. One font - one texture if no room, if there is space, multiple fonts inside texture. Mode of mixed or not
-//    b.
+// 2) Figure if existing textures can contain all the input queue
+//    a) One font - one texture if no room, if there is space, multiple fonts inside texture. Mode of mixed or not
 
 struct GlyphKey
 {

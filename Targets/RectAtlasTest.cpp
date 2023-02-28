@@ -4,10 +4,11 @@
 
 #include <vector>
 
-GlyphAtlas glyphAtlas = GlyphAtlas({64, 96, 128}, {64, 84, 100, 128}, {512, 512});
+Pair maxTextureDims = {512, 512};
+GlyphAtlas glyphAtlas = GlyphAtlas(maxTextureDims);
 
 // the containers are flushed after each step.
-std::vector<std::vector<GlyphKey>> passKeysByTestNumber {};
+std::vector<std::vector<std::pair<GlyphKey, Glyph>>> passKeysByTestNumber {};
 std::vector<std::vector<Glyph>> placedGlyphsByTexture {};
 std::vector<std::vector<Rect>> freeShelvesByTexture {};
 std::vector<std::vector<Rect>> freeSlotsByTexture {};

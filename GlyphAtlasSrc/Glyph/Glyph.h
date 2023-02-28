@@ -6,17 +6,10 @@
 
 struct Glyph
 {
-    Glyph()
-    {
-        textureId = 0;
-    }
-
-    ushort textureId;
+    ushort textureId{};
     Rect rect;
 
-    Glyph(ushort textureIdArg, Rect rectArg) : textureId(textureIdArg), rect(rectArg) {}
-
-    explicit Glyph(const std::string& serialized)
+    void Update(const std::string& serialized)
     {
         std::istringstream in {serialized};
         std::string buf;

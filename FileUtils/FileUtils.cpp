@@ -60,20 +60,22 @@ void WriteTestGlyphKeys(
     }
 }
 
-std::vector<std::vector<GlyphKey>> ReadGlyphKeysByLine(const std::string &path)
+std::vector<std::vector<std::pair<GlyphKey, Glyph>>> ReadGlyphKeysByLine(const std::string &path)
 {
     std::ifstream in{path};
     std::string line;
-    std::vector<std::vector<GlyphKey>> data;
+    std::vector<std::vector<std::pair<GlyphKey, Glyph>>> data;
     unsigned char fontId;
     ushort glyphId;
     while (std::getline(in, line))
     {
         std::istringstream ss{line};
-        std::vector<GlyphKey> lineKeys;
+        std::vector<std::pair<GlyphKey, Glyph>> lineKeys;
         while(ss >> fontId >> glyphId)
         {
-            lineKeys.push_back({fontId, glyphId});
+            GlyphKey key {fontId, glyphId};
+            Glyph glyph;
+            lineKeys.emplace_back(key, glyph);
         }
         data.push_back(lineKeys);
     }
@@ -81,13 +83,12 @@ std::vector<std::vector<GlyphKey>> ReadGlyphKeysByLine(const std::string &path)
     return data;
 }
 
-std::vector<std::pair<GlyphKey, Glyph>> ReadGlyphs(const std::vector<GlyphKey>& keys)
+void ReadGlyphs(std::vector<std::pair<GlyphKey, Glyph>> &glyphs)
 {
-    std::vector<std::pair<GlyphKey, Glyph>> glyphs;
-    glyphs.reserve(keys.size());
     std::string line;
-    for (auto key : keys)
+    for (auto pair : glyphs)
     {
+        auto key = pair.first;
         std::ifstream in{GetTestFontPath(key.fontIndex)};
         int lineCounter = 0;
         while (std::getline(in, line))
@@ -98,12 +99,10 @@ std::vector<std::pair<GlyphKey, Glyph>> ReadGlyphs(const std::vector<GlyphKey>& 
             }
             lineCounter++;
         }
-        Glyph glyph (line);
+        auto &glyph = pair.second;
+        glyph.Update(line);
         assert(glyph.rect.w > 0 && glyph.rect.h > 0);
-        glyphs.emplace_back(key, glyph);
     }
-
-    return glyphs;
 }
 
 std::string GetFontPath(int fontId)
@@ -117,28 +116,3 @@ std::string GetFontPath(int fontId)
         default: throw std::out_of_range("Unknown fontIndex" + std::to_string(fontId));
     }
 }
-
-
-/*
- * std::vector<int> fonts (fontCount);
-    std::iota(fonts.begin(), fonts.end(), fontCount);
-
-    for (int i = 0; i < fontCount; i++)
-    {
-        int font = fonts[i];
-
-        std::vector<int> glyphs (glyphCounts[font]);
-        std::iota(glyphs.begin(), glyphs.end(), glyphCounts[font]);
-        std::shuffle(glyphs.begin(), glyphs.end(), gen);
-
-        std::uniform_int_distribution<> rndGenGlyphCount(0, glyphCounts[i]);
-        int rndGlyphCount = rndGenGlyphCount(gen);
-
-        out << font;
-        for (int g = 0; g < rndGlyphCount; g++)
-        {
-            out << " " << glyphs[g];
-        }
-        out << std::endl;
-    }
- */

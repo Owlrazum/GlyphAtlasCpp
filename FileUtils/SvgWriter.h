@@ -10,7 +10,7 @@
 class SvgWriter
 {
 public:
-    SvgWriter(const std::string& backColor);
+    explicit SvgWriter(const std::string& backColor);
 
     void WriteAtlas(GlyphAtlas &atlas);
 
