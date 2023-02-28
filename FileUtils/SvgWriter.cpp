@@ -23,7 +23,7 @@ void SvgWriter::WriteAtlas(GlyphAtlas &atlas)
     {
         auto glyphs = atlas.GetGlyphsFromTexture(i);
         auto freeRects = atlas.GetFreeShelfSlotSpace(i);
-        std::ofstream out{GetTexturePath(i)};
+        std::ofstream out{GetSvgTexturePath(i)};
         out << opening;
         out << "\n";
         for (auto glyph: glyphs)

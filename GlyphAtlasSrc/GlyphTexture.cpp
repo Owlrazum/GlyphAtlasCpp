@@ -4,7 +4,15 @@
 #include <algorithm>
 #include <iterator>
 #include <iostream>
-//#include <cmath>
+
+bool GlyphTexture::GetGlyph(GlyphKey key, Glyph &glyph)
+{
+    if (auto search = placedGlyphs.find(key); search != placedGlyphs.end())
+    {
+        glyph = search->second;
+        return true;
+    }
+}
 
 std::vector<std::pair<GlyphKey, Glyph>> GlyphTexture::GetGlyphs() const
 {
@@ -36,15 +44,6 @@ std::pair<std::vector<Rect>, std::vector<Rect>> GlyphTexture::GetFreeShelfSlotSp
         }
     }
     return std::make_pair(freeShelfRects, freeSlots);
-}
-
-bool GlyphTexture::ContainsGlyph(const GlyphKey &glyphKey) const
-{
-    if (auto font = placedGlyphs.find(glyphKey); font != placedGlyphs.end())
-    {
-        return true;
-    }
-    return false;
 }
 
 /// Erases glyphs that are placed from glyphs argument;

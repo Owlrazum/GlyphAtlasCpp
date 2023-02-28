@@ -3,7 +3,11 @@
 #include "ft2build.h"
 #include FT_FREETYPE_H
 
+#include "FontKey.h"
+
 #include <string>
+#include <map>
+#include <vector>
 
 class FreeTypeWrapper
 {
@@ -11,12 +15,13 @@ public:
     FreeTypeWrapper();
     ~FreeTypeWrapper();
 
-    void UseFont(const char *fontPath, int faceIndex);
-    void SetPixelSize(int size);
-    FT_Bitmap RenderGlyph(char character);
+    void AddFont(FontKey fontKey);
+    FT_Bitmap RenderChar(FontKey fontKey, char character);
+    FT_Bitmap RenderGlyph(FontKey fontKey, int glyphIndex);
 private:
     FT_Library library;
-    FT_Face face;
+    std::map<FontKey, FT_Face> facesByFont;
+    std::vector<FT_Bitmap> createdBitmaps;
 
     FT_Error errorCode;
 };

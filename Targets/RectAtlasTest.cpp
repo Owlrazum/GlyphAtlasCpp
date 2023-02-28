@@ -23,13 +23,15 @@ extern "C"
 {
     DLLEXPORT int InitTest(int testNumber)
     {
-        passKeysByTestNumber = ReadGlyphKeysByLine(GetDataPath(testNumber));
+        passKeysByTestNumber = ReadGlyphKeysByLine(GetTestGlyphKeysPath(testNumber));
         return static_cast<int>(passKeysByTestNumber.size());
     }
 
     DLLEXPORT int InitPass(int passNumber)
     {
-        return glyphAtlas.InitPass(passKeysByTestNumber[passNumber]);
+        auto keys = passKeysByTestNumber[passNumber];
+        glyphAtlas.InitPass(keys);
+        return static_cast<int>(keys.size());
     }
 
     // returns textureCount;

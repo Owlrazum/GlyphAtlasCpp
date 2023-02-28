@@ -3,7 +3,7 @@ target_sources(TestGenerator
                SvgWriter.cpp
                FileUtils.cpp
                )
-target_include_directories(RectAtlasTest PRIVATE .)
+target_include_directories(TestGenerator PRIVATE .)
 
 target_sources(RectAtlasTest
                PRIVATE

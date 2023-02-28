@@ -3,12 +3,62 @@
 
 #include <iostream>
 
-int GlyphAtlas::InitPass(const std::vector<GlyphKey> &keys)
+// todo: improve by developing an algorithm for determining delimiters
+void GlyphAtlas::UpdateDelimiters(const std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
+{
+    if (shelfDelimiters.size() == 0 || slotDelimiters.size() == 0)
+    {
+        shelfDelimiters = {};
+        slotDelimiters = {};
+    }
+}
+
+void GlyphAtlas::Update(std::vector<std::pair<GlyphKey, Glyph>> updateGlyphs)
+{
+    std::sort(updateGlyphs.begin(), updateGlyphs.end(), CompareByHeight);
+    UpdateDelimiters(updateGlyphs);
+
+    int textureIndex = 0;
+    while (updateGlyphs.size() > 0)
+    {
+        if (textureIndex == textures.size())
+        {
+            textures.emplace_back(
+                    shelfDelimiters, slotDelimiters,
+                    textureMaxDims, textures.size());
+        }
+        auto& texture = textures[textureIndex];
+        texture.Update(updateGlyphs);
+
+        textureIndex++;
+    }
+
+    for (auto & texture : textures)
+    {
+        texture.RemoveUnused();
+    }
+}
+
+Glyph GlyphAtlas::GetGlyph(GlyphKey key)
+{
+    Glyph glyph;
+    for (auto t : textures)
+    {
+        if (t.GetGlyph(key, glyph))
+        {
+            return glyph;
+        }
+    }
+
+    throw std::out_of_range("The GlyphKey does not exists in the atlas!");
+}
+
+void GlyphAtlas::InitPass(const std::vector<GlyphKey> &keys)
 {
     queue = ReadGlyphs(keys);
     std::sort(queue.begin(), queue.end(), CompareByHeight);
+    UpdateDelimiters(queue);
     stepIndex = 0;
-    return queue.size();
 }
 
 int GlyphAtlas::Step()
@@ -36,40 +86,5 @@ int GlyphAtlas::Step()
 void GlyphAtlas::Update(const std::vector<GlyphKey> &keys)
 {
     std::vector<std::pair<GlyphKey, Glyph>> updateGlyphs = ReadGlyphs(keys);
-    std::sort(updateGlyphs.begin(), updateGlyphs.end(), CompareByHeight);
-
-    int textureIndex = 0;
-    while (updateGlyphs.size() > 0)
-    {
-        if (textureIndex == textures.size())
-        {
-            textures.emplace_back(
-                    shelfDelimiters, slotDelimiters,
-                    textureMaxDims, textures.size());
-        }
-        auto& texture = textures[textureIndex];
-        texture.Update(updateGlyphs);
-
-        textureIndex++;
-    }
-
-    for (auto & texture : textures)
-    {
-        texture.RemoveUnused();
-    }
-}
-
-bool GlyphAtlas::CompareByHeight(const std::pair<GlyphKey, Glyph> &lhs, const std::pair<GlyphKey, Glyph> &rhs)
-{
-    return lhs.second.rect.h > rhs.second.rect.h;
-}
-
-const std::vector<std::pair<GlyphKey, Glyph>> GlyphAtlas::GetGlyphsFromTexture(int textureId) const
-{
-    return textures[textureId].GetGlyphs();
-}
-
-const std::pair<std::vector<Rect>, std::vector<Rect>> GlyphAtlas::GetFreeShelfSlotSpace(int textureId) const
-{
-    return textures[textureId].GetFreeShelfSlotSpace();
+    Update(updateGlyphs);
 }

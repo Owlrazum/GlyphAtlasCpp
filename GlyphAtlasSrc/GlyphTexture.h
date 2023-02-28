@@ -33,6 +33,23 @@ public:
     void Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
     void RemoveUnused();
 
+    [[nodiscard]] bool ContainsGlyph(const GlyphKey &key) const
+    {
+        return placedGlyphs.find(key) != placedGlyphs.end();
+    }
+
+    void MarkGlyph(const GlyphKey &key)
+    {
+        currentlyPlacedGlyphs.insert(key);
+    }
+
+    bool GetGlyph(GlyphKey key, Glyph& glyph); // returns whether the glyph was found
+
+    int GetGlyphCount()
+    {
+        return static_cast<int>(placedGlyphs.size());
+    }
+
     [[nodiscard]] std::vector<std::pair<GlyphKey, Glyph>> GetGlyphs() const;
     [[nodiscard]] std::pair<std::vector<Rect>, std::vector<Rect>> GetFreeShelfSlotSpace() const; // the first vector is freeSpace for the shelves
 
@@ -40,7 +57,6 @@ public:
     { return id; }
 
     bool Step(std::pair<GlyphKey, Glyph> toPlace);
-
 private:
     Pair dims;
     ushort id;
@@ -54,8 +70,6 @@ private:
 
     const std::vector<ushort> shelfDelimiters;
     const std::vector<ushort> widthDelimiters;
-
-    [[nodiscard]] bool ContainsGlyph(const GlyphKey &glyphKey) const;
 
     bool FitInExistingSpot(std::pair<GlyphKey, Glyph> &glyph, ushort slotWidth);
 

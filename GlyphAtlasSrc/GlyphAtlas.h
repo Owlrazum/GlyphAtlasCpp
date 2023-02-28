@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Math/Rect.h"
+#include "Rect.h"
 #include "Glyph.h"
 #include "GlyphKey.h"
 #include "GlyphTexture.h"
@@ -12,30 +12,69 @@
 class GlyphAtlas
 {
 public:
-    GlyphAtlas(
-            const std::vector<ushort> &shelfDelimitersArg,
-            const std::vector<ushort> &slotDelimiters,
-            Pair textureMaxDimsArg)
-            : shelfDelimiters(shelfDelimitersArg),
-              slotDelimiters(slotDelimiters),
-              textureMaxDims(textureMaxDimsArg)
+    explicit GlyphAtlas(Pair textureMaxDimsArg)
+            : textureMaxDims(textureMaxDimsArg)
     {
+        stepIndex = 0;
         textures = std::vector<GlyphTexture>();
     };
 
+    void Update(std::vector<std::pair<GlyphKey, Glyph>> updateGlyphs);
+
 // ---- Stepped version: ----
 
-    int InitPass(const std::vector<GlyphKey> &keys);
-    int Step();
+    void InitPass(const std::vector<GlyphKey> &keys);
+
+    int Step(); // returns number of used textures
 
 // ---- SvgWriting: ----
 
     void Update(const std::vector<GlyphKey> &keys);
 
-    [[nodiscard]] const std::vector<std::pair<GlyphKey, Glyph>> GetGlyphsFromTexture(int textureId) const;
+
+    [[nodiscard]] bool ContainsGlyph(const GlyphKey& key) const
+    {
+        if (std::any_of(textures.begin(), textures.end(),
+                        [key](const GlyphTexture& t){ return t.ContainsGlyph(key); }))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    [[nodiscard]] bool MarkIfContainsGlyph(const GlyphKey& key)
+    {
+        for (auto texture : textures)
+        {
+            if (texture.ContainsGlyph(key))
+            {
+                texture.MarkGlyph(key);
+            }
+        }
+    }
+
+    [[nodiscard]] Glyph GetGlyph(GlyphKey key);
+
+    int GetPlacedGlyphsCount() const
+    {
+        int placedGlyphsCount = 0;
+        for (auto t : textures)
+        {
+            placedGlyphsCount += t.GetGlyphCount();
+        }
+        return placedGlyphsCount;
+    }
+
+    [[nodiscard]] const std::vector<std::pair<GlyphKey, Glyph>> GetGlyphsFromTexture(int textureId) const
+    {
+        return textures[textureId].GetGlyphs();
+    }
 
     [[nodiscard]] const std::pair<std::vector<Rect>, std::vector<Rect>>
-    GetFreeShelfSlotSpace(int textureId) const; // the first vector is freeSpace for the shelves
+    GetFreeShelfSlotSpace(int textureId) const // the first vector is freeSpace for the shelves
+    {
+        return textures[textureId].GetFreeShelfSlotSpace();
+    }
 
     int GetTextureCount()
     {
@@ -52,8 +91,13 @@ private:
 
     std::vector<GlyphTexture> textures; // perhaps one glyphTexture can be referenced by multiple fonts
 
-    const std::vector<ushort> shelfDelimiters;
-    const std::vector<ushort> slotDelimiters;
+    std::vector<ushort> shelfDelimiters;
+    std::vector<ushort> slotDelimiters;
 
-    static bool CompareByHeight(const std::pair<GlyphKey, Glyph> &lhs, const std::pair<GlyphKey, Glyph> &rhs);
+    void UpdateDelimiters(const std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
+
+    static bool CompareByHeight(const std::pair<GlyphKey, Glyph> &lhs, const std::pair<GlyphKey, Glyph> &rhs)
+    {
+        return lhs.second.rect.h > rhs.second.rect.h;
+    }
 };

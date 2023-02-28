@@ -4,7 +4,7 @@ target_sources(TestGenerator
                Shelf.cpp
                GlyphTexture.cpp
                )
-target_include_directories(RectAtlasTest PRIVATE . Glyph)
+target_include_directories(TestGenerator PRIVATE . Glyph)
 
 target_sources(RectAtlasTest
                PRIVATE
@@ -21,3 +21,5 @@ target_sources(GlyphAtlasTest
                GlyphTexture.cpp
                )
 target_include_directories(GlyphAtlasTest PRIVATE . Glyph)
+
+target_include_directories(FreeTypeTest PRIVATE . Glyph)

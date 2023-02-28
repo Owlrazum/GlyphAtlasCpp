@@ -6,6 +6,11 @@
 
 struct Glyph
 {
+    Glyph()
+    {
+        textureId = 0;
+    }
+
     ushort textureId;
     Rect rect;
 

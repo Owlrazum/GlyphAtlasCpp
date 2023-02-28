@@ -12,7 +12,7 @@
 //  GlyphID - integer
 // }
 
-// One shelf one fontKey ?
+// One shelf one fontIndex ?
 // The cost of restructuring
 // for each font for each size max height for the shelf
 // delimiters may be calculated based on each font
@@ -25,21 +25,21 @@
 
 struct GlyphKey
 {
-    ushort fontId;
-    ushort glyphId;
+    unsigned char fontIndex; // has another meaning when reading testcase
+    ushort glyphIndex;
 
     [[nodiscard]] std::string ToString() const
     {
-        return std::to_string(fontId) + ":" + std::to_string(glyphId);
+        return std::to_string(fontIndex) + ":" + std::to_string(glyphIndex);
     }
 
     bool operator<(const GlyphKey &rhs) const
     {
-        if (fontId < rhs.fontId)
+        if (fontIndex < rhs.fontIndex)
             return true;
-        if (rhs.fontId < fontId)
+        if (rhs.fontIndex < fontIndex)
             return false;
-        return glyphId < rhs.glyphId;
+        return glyphIndex < rhs.glyphIndex;
     }
 
     bool operator>(const GlyphKey &rhs) const

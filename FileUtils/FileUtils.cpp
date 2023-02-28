@@ -3,28 +3,28 @@
 #include <fstream>
 #include <random>
 
-std::string GetFontPath(int fontId)
+std::string GetTestFontPath(int fontId)
 {
     std::string path = "/Users/Abai/Desktop/Evolve/GlyphAtlas/TestData/font_.txt";
     path.insert(52, std::to_string(fontId));
     return path;
 }
 
-std::string GetDataPath(int testNumber)
+std::string GetTestGlyphKeysPath(int testNumber)
 {
     std::string path = "/Users/Abai/Desktop/Evolve/GlyphAtlas/TestData/test_.txt";
     path.insert(52, std::to_string(testNumber));
     return path;
 }
 
-std::string GetTexturePath(int textureId)
+std::string GetSvgTexturePath(int textureId)
 {
     std::string path = "/Users/Abai/Desktop/Evolve/GlyphAtlas/ResultTextures/texture_.svg";
     path.insert(61, std::to_string(textureId));
     return path;
 }
 
-void WriteRects(const std::string &path, const std::vector<Rect> &rects)
+void WriteTestFontRects(const std::string &path, const std::vector<Rect> &rects)
 {
     std::ofstream out{path};
     for (int i = 0; i < rects.size(); i++)
@@ -37,7 +37,7 @@ void WriteRects(const std::string &path, const std::vector<Rect> &rects)
     }
 }
 
-void GenerateAndWriteGlyphKeys(
+void WriteTestGlyphKeys(
         std::ofstream &out,
         int fontCount,
         int glyphCountInFont,
@@ -60,32 +60,12 @@ void GenerateAndWriteGlyphKeys(
     }
 }
 
-std::vector<GlyphKey> ReadGlyphKeys(const std::string &path)
-{
-    std::ifstream in{path};
-    std::string line;
-    std::vector<GlyphKey> data;
-    while (std::getline(in, line))
-    {
-        std::istringstream ss{line};
-        ushort fontId;
-        ss >> fontId;
-        ushort glyphId;
-        while (ss >> glyphId)
-        {
-            data.push_back({fontId, glyphId});
-        }
-    }
-
-    return data;
-}
-
 std::vector<std::vector<GlyphKey>> ReadGlyphKeysByLine(const std::string &path)
 {
     std::ifstream in{path};
     std::string line;
     std::vector<std::vector<GlyphKey>> data;
-    ushort fontId;
+    unsigned char fontId;
     ushort glyphId;
     while (std::getline(in, line))
     {
@@ -108,11 +88,11 @@ std::vector<std::pair<GlyphKey, Glyph>> ReadGlyphs(const std::vector<GlyphKey>& 
     std::string line;
     for (auto key : keys)
     {
-        std::ifstream in{GetFontPath(key.fontId)};
+        std::ifstream in{GetTestFontPath(key.fontIndex)};
         int lineCounter = 0;
         while (std::getline(in, line))
         {
-            if (lineCounter == key.glyphId)
+            if (lineCounter == key.glyphIndex)
             {
                 break;
             }
@@ -124,6 +104,18 @@ std::vector<std::pair<GlyphKey, Glyph>> ReadGlyphs(const std::vector<GlyphKey>& 
     }
 
     return glyphs;
+}
+
+std::string GetFontPath(int fontId)
+{
+    switch(fontId)
+    {
+        case 0: return "/Users/Abai/Desktop/Evolve/GlyphAtlas/Fonts/Lato-Regular.ttf";
+        case 1: return "/Users/Abai/Desktop/Evolve/GlyphAtlas/Fonts/Times_New_Roman.ttf";
+        case 2: return "/Users/Abai/Desktop/Evolve/GlyphAtlas/Fonts/Lato-Thin.ttf";
+        case 3: return "/Users/Abai/Desktop/Evolve/GlyphAtlas/Fonts/Lato-Black.ttf";
+        default: throw std::out_of_range("Unknown fontIndex" + std::to_string(fontId));
+    }
 }
 
 
