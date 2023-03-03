@@ -5,7 +5,7 @@
 #include <vector>
 
 FreeTypeWrapper freeType;
-uint2_16 maxTextureDims = {512, 512};
+uint16_2 maxTextureDims = {512, 512};
 GlyphAtlas glyphAtlas = GlyphAtlas(maxTextureDims);
 
 struct AtlasTextures

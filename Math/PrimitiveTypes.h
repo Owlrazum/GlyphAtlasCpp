@@ -74,25 +74,31 @@ typedef x size_t;
 
 #include <ostream>
 
-struct uint2_16
+struct uint16_2
 {
-    uint2_16(uint16 xArg, uint16 yArg) : x(xArg), y(yArg) {}
+    uint16_2(uint16 xArg, uint16 yArg) : x(xArg), y(yArg) {}
+
+    uint16_2()
+    {
+        x = 0; y = 0;
+    }
+
     uint16 x;
     uint16 y;
-    friend std::ostream& operator<<(std::ostream& out, uint2_16& pair)
+    friend std::ostream& operator<<(std::ostream& out, uint16_2& pair)
     {
         return out << pair.x << " " << pair.y;
     }
 };
 
-struct uint3_16
+struct uint16_3
 {
     uint16 x;
     uint16 y;
     uint16 z;
 };
 
-struct uint4_16
+struct uint16_4
 {
     uint16 x;
     uint16 y;

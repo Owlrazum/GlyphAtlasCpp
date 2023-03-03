@@ -10,7 +10,7 @@ void GlyphTexture::Render(FreeTypeWrapper &freeType)
     for (const auto& glyph : placedGlyphs)
     {
         auto bitmap = freeType.RenderGlyph(glyph.first);
-        uint2_16 pos = {glyph.second.rect.x, glyph.second.rect.y};
+        uint16_2 pos = {glyph.second.rect.x, glyph.second.rect.y};
         machine bitmapRowFlippedStart = bitmap.rows - 1;
         machine textureRowFlippedStart = dims.y - pos.y - 1;
         for (machine i = 0; i < bitmap.rows; i++)
@@ -97,7 +97,7 @@ bool GlyphTexture::FitInExistingSpot(std::pair<GlyphKey, Glyph> &glyph, uint16 s
     return false;
 }
 
-uint2_16 GetShelfMinMaxHeight(uint16 h, const std::vector<uint16>& delimiters)
+uint16_2 GetShelfMinMaxHeight(uint16 h, const std::vector<uint16>& delimiters)
 {
     if (h <= delimiters[0])
     {
@@ -105,7 +105,7 @@ uint2_16 GetShelfMinMaxHeight(uint16 h, const std::vector<uint16>& delimiters)
     }
     else
     {
-        uint2_16 shelfMinMaxHeight {0, 0};
+        uint16_2 shelfMinMaxHeight {0, 0};
         bool delimitersValid = false;
 
         for (machine i = 1; i < delimiters.size(); i++)
@@ -139,9 +139,9 @@ bool GlyphTexture::CreateShelf(std::pair<GlyphKey, Glyph> &glyph, uint16 slotWid
         uint16 h = freeShelves[i].y - freeShelves[i].x + 1;
         if (shelfMinMaxHeight.y <= h)
         {
-            uint2_16 mainEndPointsArg {0, static_cast<uint16>(dims.x - 1)};
+            uint16_2 mainEndPointsArg {0, static_cast<uint16>(dims.x - 1)};
             auto crossEnd = static_cast<uint16>(freeShelves[i].x + shelfMinMaxHeight.y - 1);
-            uint2_16 crossEndPointsArg {freeShelves[i].x, crossEnd};
+            uint16_2 crossEndPointsArg {freeShelves[i].x, crossEnd};
             Shelf created {mainEndPointsArg, crossEndPointsArg, shelfMinMaxHeight};
 
             created.TryAdd(glyph, slotWidth);
@@ -160,7 +160,7 @@ bool GlyphTexture::CreateShelf(std::pair<GlyphKey, Glyph> &glyph, uint16 slotWid
     return false;
 }
 
-void GlyphTexture::SplitFreeSpace(uint2_16 &freeShelf, uint16 splitHeight)
+void GlyphTexture::SplitFreeSpace(uint16_2 &freeShelf, uint16 splitHeight)
 {
     machine occupiedY = freeShelf.x + splitHeight;
     freeShelf.x = occupiedY;
@@ -209,7 +209,7 @@ void GlyphTexture::RemoveShelf(std::vector<Shelf>::iterator shelfToRemove)
     shelves.erase(shelfToRemove);
 }
 
-void GlyphTexture::ClaimFreeShelf(uint2_16 &freeShelf)
+void GlyphTexture::ClaimFreeShelf(uint16_2 &freeShelf)
 {
     bool isMerged = MergeIntoIfPossible(freeShelf, freeShelves);
     if (!isMerged)

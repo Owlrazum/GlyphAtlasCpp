@@ -1,6 +1,6 @@
 #include "EndPoints.h"
 
-bool MergeIntoIfPossible(uint2_16 &toMerge, std::vector<uint2_16> &intoContainer)
+bool MergeIntoIfPossible(uint16_2 &toMerge, std::vector<uint16_2> &intoContainer)
 {
     machine mergedIndex = -1;
     bool isByX = false;

@@ -9,14 +9,35 @@
 #include <vector>
 #include <map>
 
+struct GlyphBitmap
+{
+    uint16_2 dims;
+    int32 pitch;
+    std::vector<uint8> buffer;
+
+    explicit GlyphBitmap(FT_Bitmap freeTypeBitmap)
+    {
+        dims.x = static_cast<uint16>(freeTypeBitmap.width);
+        dims.y = static_cast<uint16>(freeTypeBitmap.rows);
+        pitch = freeTypeBitmap.pitch;
+        buffer.reserve(dims.x * dims.y);
+        auto ftBuffer = freeTypeBitmap.buffer;
+        for (int i = 0; i < dims.y; i++)
+        {
+            memcpy(buffer.data() + i * pitch, ftBuffer + i * pitch, dims.x);
+        }
+    }
+};
+
 class GlyphAtlas
 {
 public:
-    explicit GlyphAtlas(uint2_16 textureMaxDimsArg)
+    explicit GlyphAtlas(uint16_2 textureMaxDimsArg)
             : textureMaxDims(textureMaxDimsArg)
     {
         stepIndex = 0;
         textures = std::vector<GlyphTexture>();
+        bitmaps = std::map<GlyphKey, GlyphBitmap>();
     };
 
     void InitGlyphDims(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
@@ -47,10 +68,13 @@ public:
         { return static_cast<int>(textures.size()); }
 
 private:
-    uint2_16 textureMaxDims;
+    uint16_2 textureMaxDims;
     FreeTypeWrapper freeTypeWrapper;
 
     std::vector<GlyphTexture> textures; // perhaps one glyphTexture can be referenced by multiple fonts
+
+    std::map<GlyphKey, GlyphBitmap> bitmaps;
+
 
     std::vector<uint16> shelfDelimiters;
     std::vector<uint16> slotDelimiters;

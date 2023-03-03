@@ -16,7 +16,7 @@ class GlyphTexture
 public:
     GlyphTexture(const std::vector<uint16> &shelfDelimitersArg,
                  const std::vector<uint16> &widthDelimitersArg,
-                 const uint2_16 &textureDims,
+                 const uint16_2 &textureDims,
                  uint16 idArg)
             : shelfDelimiters(shelfDelimitersArg),
               widthDelimiters(widthDelimitersArg),
@@ -61,13 +61,13 @@ public:
 
     bool Step(std::pair<GlyphKey, Glyph> toPlace);
 private:
-    uint2_16 dims;
+    uint16_2 dims;
     uint16 id;
 
     std::vector<unsigned char> textureBuffer;
 
     std::vector<Shelf> shelves;
-    std::vector<uint2_16> freeShelves; // uint2_16.x - yMin pos, uint2_16.y - yMax pos
+    std::vector<uint16_2> freeShelves; // uint2_16.x - yMin pos, uint2_16.y - yMax pos
 
     std::map<GlyphKey, Glyph> placedGlyphs; // we need prev and cur, because placedGlyph is basically a mixture of both.
     std::set<GlyphKey> previouslyPlacedGlyphs;
@@ -80,7 +80,7 @@ private:
 
     bool CreateShelf(std::pair<GlyphKey, Glyph> &glyph, uint16 slotWidth);
 
-    static void SplitFreeSpace(uint2_16 &freeShelf, uint16 splitHeight);
+    static void SplitFreeSpace(uint16_2 &freeShelf, uint16 splitHeight);
     void RemoveShelf(std::vector<Shelf>::iterator shelfToRemove);
-    void ClaimFreeShelf(uint2_16 &freeShelf);
+    void ClaimFreeShelf(uint16_2 &freeShelf);
 };

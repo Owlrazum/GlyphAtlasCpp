@@ -22,6 +22,13 @@ target_sources(RectAtlasTest
                )
 target_include_directories(RectAtlasTest PRIVATE ${SIMDUTF_INCLUDE})
 
+target_link_libraries(FreeTypeTest ${SIMDUTF_LIBRARY})
+target_sources(FreeTypeTest
+               PRIVATE
+               SimdUtfWrapper.cpp
+               )
+target_include_directories(FreeTypeTest PRIVATE ${SIMDUTF_INCLUDE})
+
 target_link_libraries(TestGenerator ${SIMDUTF_LIBRARY})
 target_sources(TestGenerator
                PRIVATE

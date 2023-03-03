@@ -10,9 +10,19 @@ void GlyphAtlas::InitGlyphDims(std::vector<std::pair<GlyphKey, Glyph>> &updateGl
     for (auto& pair : updateGlyphs)
     {
         freeTypeWrapper.AddFont(pair.first.fontIndex);
-        auto bitmap = freeTypeWrapper.RenderGlyph(pair.first);
-        pair.second.rect.w = bitmap.pitch;
-        pair.second.rect.h = bitmap.rows;
+        if (auto search = bitmaps.find(pair.first); search != bitmaps.end())
+        {
+            pair.second.rect.w = search->second.dims.x;
+            pair.second.rect.h = search->second.dims.y;
+        }
+        else
+        {
+            auto ftBitmap = freeTypeWrapper.RenderGlyph(pair.first);
+            GlyphBitmap bitmap (ftBitmap);
+            bitmaps.insert(std::make_pair(pair.first, bitmap));
+            pair.second.rect.w = bitmap.dims.x;
+            pair.second.rect.h = bitmap.dims.y;
+        }
     }
 }
 
@@ -76,13 +86,13 @@ Glyph GlyphAtlas::GetGlyph(GlyphKey key)
 }
 
 // todo: read glyph rects using freetype
-//void GlyphAtlas::InitPass(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
-//{
-//    ReadGlyphRects(updateGlyphs);
-//    std::sort(queue.begin(), queue.end(), CompareByHeight);
-//    UpdateDelimiters(queue);
-//    stepIndex = 0;
-//}
+void GlyphAtlas::InitPass(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
+{
+    InitGlyphDims(updateGlyphs);
+    std::sort(queue.begin(), queue.end(), CompareByHeight);
+    UpdateDelimiters(queue);
+    stepIndex = 0;
+}
 
 machine GlyphAtlas::Step()
 {

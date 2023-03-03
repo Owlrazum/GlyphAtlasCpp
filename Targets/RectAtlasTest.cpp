@@ -4,7 +4,7 @@
 
 #include <vector>
 
-uint2_16 maxTextureDims = {512, 512};
+uint16_2 maxTextureDims = {512, 512};
 GlyphAtlas glyphAtlas = GlyphAtlas(maxTextureDims);
 
 // the containers are flushed after each step.

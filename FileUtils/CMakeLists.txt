@@ -5,6 +5,12 @@ target_sources(TestGenerator
                )
 target_include_directories(TestGenerator PRIVATE .)
 
+target_sources(FreeTypeTest
+               PRIVATE
+               FileUtils.cpp
+               )
+target_include_directories(FreeTypeTest PRIVATE .)
+
 target_sources(RectAtlasTest
                PRIVATE
                FileUtils.cpp
