@@ -1,12 +1,19 @@
 set(SIMDUTF_LIBRARY /Users/Abai/Desktop/Evolve/GlyphAtlas/SimdUtf/libsimdutf.a)
 set(SIMDUTF_INCLUDE /Users/Abai/Desktop/Evolve/simdutf/include)
 
-target_link_libraries(GlyphAtlasTestTest ${SIMDUTF_LIBRARY})
-target_sources(GlyphAtlasTestTest
+target_link_libraries(RectAtlasTest ${SIMDUTF_LIBRARY})
+target_sources(RectAtlasTest
                PRIVATE
                SimdUtfWrapper.cpp
                )
-target_include_directories(GlyphAtlasTestTest PRIVATE ${SIMDUTF_INCLUDE})
+target_include_directories(RectAtlasTest PRIVATE ${SIMDUTF_INCLUDE})
+
+target_link_libraries(RectAtlasTestTest ${SIMDUTF_LIBRARY})
+target_sources(RectAtlasTestTest
+               PRIVATE
+               SimdUtfWrapper.cpp
+               )
+target_include_directories(RectAtlasTestTest PRIVATE ${SIMDUTF_INCLUDE})
 
 target_link_libraries(GlyphAtlasTest ${SIMDUTF_LIBRARY})
 target_sources(GlyphAtlasTest
@@ -15,12 +22,12 @@ target_sources(GlyphAtlasTest
                )
 target_include_directories(GlyphAtlasTest PRIVATE ${SIMDUTF_INCLUDE})
 
-target_link_libraries(RectAtlasTest ${SIMDUTF_LIBRARY})
-target_sources(RectAtlasTest
+target_link_libraries(GlyphAtlasTestTest ${SIMDUTF_LIBRARY})
+target_sources(GlyphAtlasTestTest
                PRIVATE
                SimdUtfWrapper.cpp
                )
-target_include_directories(RectAtlasTest PRIVATE ${SIMDUTF_INCLUDE})
+target_include_directories(GlyphAtlasTestTest PRIVATE ${SIMDUTF_INCLUDE})
 
 target_link_libraries(FreeTypeTest ${SIMDUTF_LIBRARY})
 target_sources(FreeTypeTest

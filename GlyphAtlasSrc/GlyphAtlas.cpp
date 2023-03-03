@@ -89,6 +89,7 @@ Glyph GlyphAtlas::GetGlyph(GlyphKey key)
 void GlyphAtlas::InitPass(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
 {
     InitGlyphDims(updateGlyphs);
+    queue = updateGlyphs;
     std::sort(queue.begin(), queue.end(), CompareByHeight);
     UpdateDelimiters(queue);
     stepIndex = 0;

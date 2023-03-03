@@ -18,6 +18,13 @@ target_sources(RectAtlasTest
                )
 target_include_directories(RectAtlasTest PRIVATE ${FREETYPE_INCLUDE} .)
 
+target_link_libraries(RectAtlasTestTest ${FREETYPE_LIBRARIES})
+target_sources(RectAtlasTestTest
+               PRIVATE
+               FreeTypeWrapper.cpp
+               )
+target_include_directories(RectAtlasTestTest PRIVATE ${FREETYPE_INCLUDE} .)
+
 target_link_libraries(GlyphAtlasTest ${FREETYPE_LIBRARIES})
 target_sources(GlyphAtlasTest
                PRIVATE

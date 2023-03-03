@@ -9,15 +9,15 @@ GlyphAtlas glyphAtlas = GlyphAtlas(maxTextureDims);
 
 // the containers are flushed after each step.
 std::vector<std::vector<std::pair<GlyphKey, Glyph>>> passKeysByTestNumber {};
-std::vector<std::vector<Glyph>> placedGlyphsByTexture {};
+std::vector<std::vector<std::pair<GlyphKey, Glyph>>> placedGlyphsByTexture {};
 std::vector<std::vector<Rect>> freeShelvesByTexture {};
 std::vector<std::vector<Rect>> freeSlotsByTexture {};
 
 struct int3
 {
-    machine x;
-    machine y;
-    machine z;
+    uint32 x;
+    uint32 y;
+    uint32 z;
 };
 
 extern "C"
@@ -28,6 +28,7 @@ extern "C"
         return static_cast<int>(passKeysByTestNumber.size());
     }
 
+    // returns stepsCount
     DLLEXPORT machine InitPass(machine passNumber)
     {
         auto keys = passKeysByTestNumber[passNumber];
@@ -43,11 +44,11 @@ extern "C"
         placedGlyphsByTexture.clear();
         for (machine i = 0; i < texturesCount; i++)
         {
-            auto textureGlyphuint2_16s = glyphAtlas.GetGlyphsFromTexture(i);
-            std::vector<Glyph> textureGlyphs;
-            for (auto pair : textureGlyphuint2_16s)
+            auto textureGlyphsMap = glyphAtlas.GetGlyphsFromTexture(i);
+            std::vector<std::pair<GlyphKey, Glyph>> textureGlyphs(textureGlyphsMap.size());
+            for (auto pair : textureGlyphsMap)
             {
-                textureGlyphs.push_back(pair.second);
+                textureGlyphs.emplace_back(pair);
             }
             placedGlyphsByTexture.push_back(textureGlyphs);
         }
@@ -68,15 +69,15 @@ extern "C"
     DLLEXPORT int3 GetRectsCount(machine textureId)
     {
         return {
-            static_cast<int>(placedGlyphsByTexture[textureId].size()),
-            static_cast<int>(freeShelvesByTexture[textureId].size()),
-            static_cast<int>(freeSlotsByTexture[textureId].size())
+            static_cast<uint32>(placedGlyphsByTexture[textureId].size()),
+            static_cast<uint32>(freeShelvesByTexture[textureId].size()),
+            static_cast<uint32>(freeSlotsByTexture[textureId].size())
         };
     }
 
     DLLEXPORT CRect GetPlacedGlyph(machine textureId, machine glyphIndex)
     {
-        return placedGlyphsByTexture[textureId][glyphIndex].rect;
+        return placedGlyphsByTexture[textureId][glyphIndex].second.rect;
     }
     DLLEXPORT CRect GetFreeShelfRect(machine textureId, machine freeShelfIndex)
     {
@@ -86,4 +87,34 @@ extern "C"
     {
         return freeSlotsByTexture[textureId][freeSlotIndex];
     }
+}
+
+int main()
+{
+    auto passCount = InitTest(0);
+    for (int p = 0; p < passCount; p++)
+    {
+        auto stepsCount = InitPass(p);
+        for (machine s = 0; s < stepsCount; s++)
+        {
+            auto texturesCount = Step();
+            for (machine t = 0; t < texturesCount; t++)
+            {
+                int3 rectsCounts = GetRectsCount(t);
+                for (machine r = 0; r < rectsCounts.x; r++)
+                {
+                    GetPlacedGlyph(t, r);
+                }
+                for (machine r = 0; r < rectsCounts.y; r++)
+                {
+                    GetFreeShelfRect(t, r);
+                }
+                for (machine r = 0; r < rectsCounts.z; r++)
+                {
+                    GetFreeSlotRect(t, r);
+                }
+            }
+        }
+    }
+    passKeysByTestNumber = ReadGlyphKeysByLine(GetTestGlyphKeysPath(0));
 }

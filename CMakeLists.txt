@@ -9,6 +9,7 @@ add_library(GlyphAtlasTest SHARED Targets/GlyphAtlasTest.cpp)
 
 add_executable(TestGenerator Targets/TestGenerator.cpp )
 add_executable(GlyphAtlasTestTest Targets/GlyphAtlasTest.cpp)
+add_executable(RectAtlasTestTest Targets/RectAtlasTest.cpp)
 
 add_subdirectory(GlyphAtlasSrc)
 add_subdirectory(FileUtils)
