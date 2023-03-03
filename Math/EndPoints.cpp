@@ -1,10 +1,10 @@
 #include "EndPoints.h"
 
-bool MergeIntoIfPossible(Pair &toMerge, std::vector<Pair> &intoContainer)
+bool MergeIntoIfPossible(uint2_16 &toMerge, std::vector<uint2_16> &intoContainer)
 {
-    int mergedIndex = -1;
+    machine mergedIndex = -1;
     bool isByX = false;
-    for (int i = 0; i < intoContainer.size(); i++)
+    for (machine i = 0; i < intoContainer.size(); i++)
     {
         if (abs(toMerge.x - intoContainer[i].y) == 1)
         {
@@ -25,7 +25,7 @@ bool MergeIntoIfPossible(Pair &toMerge, std::vector<Pair> &intoContainer)
     {
         if (isByX)
         {
-            for (int i = mergedIndex + 1; i < intoContainer.size(); i++)
+            for (machine i = mergedIndex + 1; i < intoContainer.size(); i++)
             {
                 if (abs(intoContainer[mergedIndex].y - intoContainer[i].x) == 1)
                 {
@@ -37,7 +37,7 @@ bool MergeIntoIfPossible(Pair &toMerge, std::vector<Pair> &intoContainer)
             }
         } else
         {
-            for (int i = mergedIndex + 1; i < intoContainer.size(); i++)
+            for (machine i = mergedIndex + 1; i < intoContainer.size(); i++)
             {
                 if (abs(intoContainer[mergedIndex].x - intoContainer[i].y) == 1)
                 {

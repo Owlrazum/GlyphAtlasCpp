@@ -19,7 +19,7 @@ SvgWriter::SvgWriter(const std::string &backColor)
 void SvgWriter::WriteAtlas(GlyphAtlas &atlas)
 {
     auto size = atlas.GetTexturesCount();
-    for (int i = 0; i < size; i++)
+    for (machine i = 0; i < size; i++)
     {
         auto glyphs = atlas.GetGlyphsFromTexture(i);
         auto freeRects = atlas.GetFreeShelfSlotSpace(i);
@@ -52,7 +52,7 @@ void SvgWriter::WriteRect(Rect rect, std::ofstream &out, const std::string &colo
         << "\" fill=\"" << color << "\" /> \n";
 }
 
-void SvgWriter::WriteRect(Rect &rect, std::ofstream &out, const std::string &fillColor, ushort borderWidthHalf,
+void SvgWriter::WriteRect(Rect &rect, std::ofstream &out, const std::string &fillColor, uint16 borderWidthHalf,
                           const std::string &borderColor)
 {
     out << indent << "<rect x=\"" << rect.x + borderWidthHalf << "\" y=\"" << rect.y + borderWidthHalf

@@ -25,3 +25,10 @@ target_sources(GlyphAtlasTest
                EndPoints.cpp
                )
 target_include_directories(GlyphAtlasTest PRIVATE .)
+
+target_sources(GlyphAtlasTestTest
+               PRIVATE
+               Rect.cpp
+               EndPoints.cpp
+               )
+target_include_directories(GlyphAtlasTestTest PRIVATE .)

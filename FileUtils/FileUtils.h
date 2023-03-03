@@ -6,18 +6,19 @@
 
 #include <vector>
 
-std::string GetTestFontPath(int fontId);
-std::string GetTestGlyphKeysPath(int testNumber);
-std::string GetSvgTexturePath(int textureId);
+std::string GetFontPath(machine fontId);
+std::string GetTestGlyphKeysPath(machine testNumber);
+std::string GetSvgTexturePath(machine textureId);
 
-void WriteTestFontRects(const std::string& path, const std::vector<Rect>& rects);
+// writes rndFontIndex and rnd latin character
 void WriteTestGlyphKeys(
         std::ofstream &out,
-        int fontCount,
-        int glyphCountInFont,
-        int keysCountInPass);
+        machine fontCount,
+        machine keysCountInPass);
 
-void ReadGlyphs(std::vector<std::pair<GlyphKey, Glyph>> &glyphs);
 std::vector<std::vector<std::pair<GlyphKey, Glyph>>> ReadGlyphKeysByLine(const std::string &path);
 
-std::string GetFontPath(int fontId);
+// obsoletes
+//void ReadGlyphRects(std::vector<std::pair<GlyphKey, Glyph>> &glyphs);
+//void WriteTestFontRects(const std::string& path, const std::vector<Rect>& rects);
+//std::string GetTestFontPath(machine fontId);

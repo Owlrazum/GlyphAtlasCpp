@@ -16,3 +16,8 @@ target_sources(GlyphAtlasTest
                FileUtils.cpp
                )
 target_include_directories(GlyphAtlasTest PRIVATE .)
+
+target_sources(GlyphAtlasTestTest
+               PRIVATE
+               FileUtils.cpp)
+target_include_directories(GlyphAtlasTestTest PRIVATE .)

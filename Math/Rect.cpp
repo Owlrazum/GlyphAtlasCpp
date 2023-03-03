@@ -19,7 +19,7 @@ std::string Rect::ToString() const
            std::to_string(h);
 }
 
-Rect::Rect(ushort xArg, ushort yArg, ushort wArg, ushort hArg) : CRect()
+Rect::Rect(uint16 xArg, uint16 yArg, uint16 wArg, uint16 hArg) : CRect()
 {
     x = xArg;
     y = yArg;
@@ -27,7 +27,7 @@ Rect::Rect(ushort xArg, ushort yArg, ushort wArg, ushort hArg) : CRect()
     h = hArg;
 }
 
-void Rect::Update(ushort xArg, ushort yArg, ushort wArg, ushort hArg)
+void Rect::Update(uint16 xArg, uint16 yArg, uint16 wArg, uint16 hArg)
 {
     this->x = xArg;
     this->y = yArg;

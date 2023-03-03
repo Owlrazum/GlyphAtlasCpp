@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Tuple.h"
+#include "PrimitiveTypes.h"
 
 extern "C" typedef struct CRect
 {
-    ushort x;
-    ushort y;
-    ushort w;
-    ushort h;
+    uint16 x;
+    uint16 y;
+    uint16 w;
+    uint16 h;
 } CRect;
 
 #include <string>
@@ -16,14 +16,14 @@ struct Rect : CRect
 {
     Rect();
 
-    Rect(ushort xArg, ushort yArg, ushort wArg, ushort hArg);
+    Rect(uint16 xArg, uint16 yArg, uint16 wArg, uint16 hArg);
 
     explicit Rect(const std::string &);
 
-    [[nodiscard]] int GetArea() const
+    [[nodiscard]] uint32 GetArea() const
     { return w * h; }
 
-    void Update(ushort xArg, ushort yArg, ushort wArg, ushort hArg);
+    void Update(uint16 xArg, uint16 yArg, uint16 wArg, uint16 hArg);
 
     [[nodiscard]] std::string ToString() const;
 };

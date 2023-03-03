@@ -2,28 +2,22 @@
 #include "GlyphAtlas.h"
 #include "CppExport.h"
 
-#include "FreeTypeWrapper.h"
-
 #include <vector>
 
 FreeTypeWrapper freeType;
-Pair maxTextureDims = {512, 512};
+uint2_16 maxTextureDims = {512, 512};
 GlyphAtlas glyphAtlas = GlyphAtlas(maxTextureDims);
 
 struct AtlasTextures
 {
-    unsigned char **textures;
-    int *widths;
-    int *heights;
-    int count;
+    uint8 **textures;
+    machine count;
 };
-
-AtlasTextures atlasTextures;
 
 extern "C"
 {
     // returns number of glyphs
-    DLLEXPORT AtlasTextures* RenderGlyphs(int testNumber)
+    DLLEXPORT void RenderAtlasTextures(AtlasTextures* atlasTextures, machine testNumber)
     {
         auto testCase = ReadGlyphKeysByLine(GetTestGlyphKeysPath(testNumber));
         for (auto& pass : testCase)
@@ -33,29 +27,32 @@ extern "C"
         }
 
         glyphAtlas.Render();
-        int texturesCount = glyphAtlas.GetTexturesCount();
 
-        auto textures = new unsigned char *[texturesCount];
-        auto width = new int[texturesCount];
-        auto heights = new int[texturesCount];
-
-        for (int i = 0; i < texturesCount; i++)
+        auto texturesCount = glyphAtlas.GetTexturesCount();
+        atlasTextures->count = texturesCount;
+        atlasTextures->textures = new uint8*[texturesCount];
+        for (machine i = 0; i < texturesCount; i++)
         {
-            textures[i] = glyphAtlas.GetTextureBuffer(i);
-            width[i] = maxTextureDims.x;
-            heights[i] = maxTextureDims.y;
+            atlasTextures->textures[i] = glyphAtlas.GetTextureBuffer(i);
         }
-
-        atlasTextures = {textures, width, heights, texturesCount};
-        return &atlasTextures;
     }
 
-    DLLEXPORT void FreeData()
+    DLLEXPORT void FreeAtlasTextures(AtlasTextures* atlasTextures)
     {
         // The textureBuffers themselves are taken from GlyphTexture's vector.
         // So no need to free them.
-        delete atlasTextures.textures;
-        delete atlasTextures.widths;
-        delete atlasTextures.heights;
+        delete atlasTextures->textures;
     }
+}
+
+int main()
+{
+    auto testCase = ReadGlyphKeysByLine(GetTestGlyphKeysPath(0));
+    for (auto& pass : testCase)
+    {
+        glyphAtlas.InitGlyphDims(pass);
+        glyphAtlas.Update(pass);
+    }
+
+    glyphAtlas.Render();
 }

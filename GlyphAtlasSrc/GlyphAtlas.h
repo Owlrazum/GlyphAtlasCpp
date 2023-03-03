@@ -12,7 +12,7 @@
 class GlyphAtlas
 {
 public:
-    explicit GlyphAtlas(Pair textureMaxDimsArg)
+    explicit GlyphAtlas(uint2_16 textureMaxDimsArg)
             : textureMaxDims(textureMaxDimsArg)
     {
         stepIndex = 0;
@@ -24,12 +24,12 @@ public:
 
 // ---- Stepped version: ----
     void InitPass(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
-    int Step(); // returns number of used textures
+    machine Step(); // returns number of used textures
     void Render();
 
 // ---- Getters: ----
 
-    unsigned  char* GetTextureBuffer(int textureId)
+    uint8* GetTextureBuffer(machine textureId)
     {
         return textures[textureId].GetRawBuffer();
     }
@@ -37,23 +37,23 @@ public:
     [[nodiscard]] bool ContainsGlyph(const GlyphKey& key) const;
     [[nodiscard]] bool MarkIfContainsGlyph(const GlyphKey& key);
     [[nodiscard]] Glyph GetGlyph(GlyphKey key);
-    [[nodiscard]] int GetPlacedGlyphsCount() const;
+    [[nodiscard]] machine GetPlacedGlyphsCount() const;
 
-    [[nodiscard]] std::map<GlyphKey, Glyph> GetGlyphsFromTexture(int textureId)
+    [[nodiscard]] std::map<GlyphKey, Glyph> GetGlyphsFromTexture(machine textureId)
         { return textures[textureId].GetGlyphs(); }
-    [[nodiscard]] std::pair<std::vector<Rect>, std::vector<Rect>> GetFreeShelfSlotSpace(int textureId) const // the first vector is freeSpace for the shelves
+    [[nodiscard]] std::pair<std::vector<Rect>, std::vector<Rect>> GetFreeShelfSlotSpace(machine textureId) const // the first vector is freeSpace for the shelves
         { return textures[textureId].GetFreeShelfSlotSpace(); }
-    int GetTexturesCount()
+    machine GetTexturesCount()
         { return static_cast<int>(textures.size()); }
 
 private:
-    Pair textureMaxDims;
+    uint2_16 textureMaxDims;
     FreeTypeWrapper freeTypeWrapper;
 
     std::vector<GlyphTexture> textures; // perhaps one glyphTexture can be referenced by multiple fonts
 
-    std::vector<ushort> shelfDelimiters;
-    std::vector<ushort> slotDelimiters;
+    std::vector<uint16> shelfDelimiters;
+    std::vector<uint16> slotDelimiters;
 
     void UpdateDelimiters(const std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
 
@@ -63,6 +63,6 @@ private:
     }
 
     // ---- Stepped version ----
-    int stepIndex;
+    machine stepIndex;
     std::vector<std::pair<GlyphKey, Glyph>> queue;
 };

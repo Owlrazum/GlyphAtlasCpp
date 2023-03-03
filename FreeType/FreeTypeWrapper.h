@@ -22,8 +22,8 @@ public:
     }
 
     void AddFont(FontKey fontKey);
-    FT_Bitmap RenderChar(const FontKey &fontKey, char character);
-    FT_Bitmap RenderGlyph(const FontKey &fontKey, int glyphIndex);
+    FT_Bitmap RenderChar(const FontKey &fontKey, uint32 character);
+    FT_Bitmap RenderGlyphIndex(const FontKey &fontKey, machine glyphIndex);
     FT_Bitmap RenderGlyph(const GlyphKey& key);
 private:
     FT_Library library;
@@ -32,5 +32,5 @@ private:
 
     FT_Error errorCode;
 
-    const long defaultFontSize = 16 * 32;
+    const int32 defaultFontSize = 16 * 64;
 };

@@ -9,6 +9,7 @@ void GlyphAtlas::InitGlyphDims(std::vector<std::pair<GlyphKey, Glyph>> &updateGl
 {
     for (auto& pair : updateGlyphs)
     {
+        freeTypeWrapper.AddFont(pair.first.fontIndex);
         auto bitmap = freeTypeWrapper.RenderGlyph(pair.first);
         pair.second.rect.w = bitmap.pitch;
         pair.second.rect.h = bitmap.rows;
@@ -21,7 +22,7 @@ void GlyphAtlas::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
     std::sort(updateGlyphs.begin(), updateGlyphs.end(), CompareByHeight);
     UpdateDelimiters(updateGlyphs);
 
-    int textureIndex = 0;
+    machine textureIndex = 0;
     while (!updateGlyphs.empty())
     {
         if (textureIndex == textures.size())
@@ -45,10 +46,10 @@ void GlyphAtlas::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
 // todo: improve by developing an algorithm for determining delimiters
 void GlyphAtlas::UpdateDelimiters(const std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
 {
-    if (shelfDelimiters.empty() || slotDelimiters.empty() == 0)
+    if (shelfDelimiters.empty() || slotDelimiters.empty())
     {
         shelfDelimiters = {16, 32, 64};
-        slotDelimiters = {16, 32, 48, 64};
+        slotDelimiters = {16, 32, 48, 64, 96};
     }
 }
 
@@ -74,18 +75,19 @@ Glyph GlyphAtlas::GetGlyph(GlyphKey key)
     throw std::out_of_range("The GlyphKey does not exists in the atlas!");
 }
 
-void GlyphAtlas::InitPass(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
-{
-    ReadGlyphs(updateGlyphs);
-    std::sort(queue.begin(), queue.end(), CompareByHeight);
-    UpdateDelimiters(queue);
-    stepIndex = 0;
-}
+// todo: read glyph rects using freetype
+//void GlyphAtlas::InitPass(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
+//{
+//    ReadGlyphRects(updateGlyphs);
+//    std::sort(queue.begin(), queue.end(), CompareByHeight);
+//    UpdateDelimiters(queue);
+//    stepIndex = 0;
+//}
 
-int GlyphAtlas::Step()
+machine GlyphAtlas::Step()
 {
     auto toStep = queue[stepIndex];
-    int textureIndex = 0;
+    machine textureIndex = 0;
     bool wasPlaced;
     do
     {
@@ -127,9 +129,9 @@ bool GlyphAtlas::MarkIfContainsGlyph(const GlyphKey &key)
     return false;
 }
 
-int GlyphAtlas::GetPlacedGlyphsCount() const
+machine GlyphAtlas::GetPlacedGlyphsCount() const
 {
-    int placedGlyphsCount = 0;
+    machine placedGlyphsCount = 0;
     for (auto t : textures)
     {
         placedGlyphsCount += t.GetGlyphCount();

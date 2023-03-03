@@ -4,7 +4,7 @@
 
 #include <vector>
 
-Pair maxTextureDims = {512, 512};
+uint2_16 maxTextureDims = {512, 512};
 GlyphAtlas glyphAtlas = GlyphAtlas(maxTextureDims);
 
 // the containers are flushed after each step.
@@ -15,20 +15,20 @@ std::vector<std::vector<Rect>> freeSlotsByTexture {};
 
 struct int3
 {
-    int x;
-    int y;
-    int z;
+    machine x;
+    machine y;
+    machine z;
 };
 
 extern "C"
 {
-    DLLEXPORT int InitTest(int testNumber)
+    DLLEXPORT machine InitTest(machine testNumber)
     {
         passKeysByTestNumber = ReadGlyphKeysByLine(GetTestGlyphKeysPath(testNumber));
         return static_cast<int>(passKeysByTestNumber.size());
     }
 
-    DLLEXPORT int InitPass(int passNumber)
+    DLLEXPORT machine InitPass(machine passNumber)
     {
         auto keys = passKeysByTestNumber[passNumber];
         glyphAtlas.InitPass(keys);
@@ -36,17 +36,16 @@ extern "C"
     }
 
     // returns textureCount;
-    DLLEXPORT int Step()
+    DLLEXPORT machine Step()
     {
-        int texturesCount = glyphAtlas.Step();
+        machine texturesCount = glyphAtlas.Step();
 
         placedGlyphsByTexture.clear();
-        for (int i = 0; i < texturesCount; i++)
+        for (machine i = 0; i < texturesCount; i++)
         {
-            auto textureGlyphPairs = glyphAtlas.GetGlyphsFromTexture(i);
+            auto textureGlyphuint2_16s = glyphAtlas.GetGlyphsFromTexture(i);
             std::vector<Glyph> textureGlyphs;
-            auto data = textureGlyphs.data();
-            for (auto pair : textureGlyphPairs)
+            for (auto pair : textureGlyphuint2_16s)
             {
                 textureGlyphs.push_back(pair.second);
             }
@@ -55,7 +54,7 @@ extern "C"
 
         freeShelvesByTexture.clear();
         freeSlotsByTexture.clear();
-        for (int i = 0; i < texturesCount; i++)
+        for (machine i = 0; i < texturesCount; i++)
         {
             auto freeRects = glyphAtlas.GetFreeShelfSlotSpace(i);
             freeShelvesByTexture.push_back(freeRects.first);
@@ -66,7 +65,7 @@ extern "C"
     }
 
     // x - placed, y - freeShelves, z - freeSlots
-    DLLEXPORT int3 GetRectsCount(int textureId)
+    DLLEXPORT int3 GetRectsCount(machine textureId)
     {
         return {
             static_cast<int>(placedGlyphsByTexture[textureId].size()),
@@ -75,15 +74,15 @@ extern "C"
         };
     }
 
-    DLLEXPORT CRect GetPlacedGlyph(int textureId, int glyphIndex)
+    DLLEXPORT CRect GetPlacedGlyph(machine textureId, machine glyphIndex)
     {
         return placedGlyphsByTexture[textureId][glyphIndex].rect;
     }
-    DLLEXPORT CRect GetFreeShelfRect(int textureId, int freeShelfIndex)
+    DLLEXPORT CRect GetFreeShelfRect(machine textureId, machine freeShelfIndex)
     {
         return freeShelvesByTexture[textureId][freeShelfIndex];
     }
-    DLLEXPORT CRect GetFreeSlotRect(int textureId, int freeSlotIndex)
+    DLLEXPORT CRect GetFreeSlotRect(machine textureId, machine freeSlotIndex)
     {
         return freeSlotsByTexture[textureId][freeSlotIndex];
     }

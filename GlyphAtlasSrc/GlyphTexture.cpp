@@ -10,15 +10,16 @@ void GlyphTexture::Render(FreeTypeWrapper &freeType)
     for (const auto& glyph : placedGlyphs)
     {
         auto bitmap = freeType.RenderGlyph(glyph.first);
-        for (int i = 0; i < bitmap.rows; i++)
+        uint2_16 pos = {glyph.second.rect.x, glyph.second.rect.y};
+        machine bitmapRowFlippedStart = bitmap.rows - 1;
+        machine textureRowFlippedStart = dims.y - pos.y - 1;
+        for (machine i = 0; i < bitmap.rows; i++)
         {
-            auto rowStart = bitmap.buffer + i * bitmap.pitch;
-            auto rowEnd = rowStart + bitmap.pitch;
+            machine bitmapRowFlipped = bitmapRowFlippedStart - i;
+            auto rowStart = bitmap.buffer + bitmapRowFlipped * bitmap.pitch;
+            auto dest = textureBuffer.data() + (textureRowFlippedStart - bitmapRowFlipped ) * dims.x + pos.x;
 
-            Pair pos = {glyph.second.rect.x, glyph.second.rect.y};
-            auto dest = textureBuffer.begin() + pos.y * dims.x + pos.x;
-
-            std::copy(rowStart, rowEnd, dest);
+            memcpy(dest, rowStart, bitmap.pitch);
         }
     }
 }
@@ -26,14 +27,14 @@ void GlyphTexture::Render(FreeTypeWrapper &freeType)
 /// Erases glyphs that are placed from glyphs argument;
 void GlyphTexture::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
 {
-    for(int i = 0; i < updateGlyphs.size(); i++)
+    for(machine i = 0; i < updateGlyphs.size(); i++)
     {
         auto updateGlyph = updateGlyphs[i];
         GlyphKey &glyphKey = updateGlyph.first;
         Glyph &glyph = updateGlyph.second;
 
-        ushort slotWidth = 0;
-        for (ushort widthDelimiter : widthDelimiters)
+        uint16 slotWidth = 0;
+        for (uint16 widthDelimiter : widthDelimiters)
         {
             if (glyph.rect.w <= widthDelimiter)
             {
@@ -78,11 +79,11 @@ void GlyphTexture::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
 }
 
 /// returns whether appropriate spot was found
-bool GlyphTexture::FitInExistingSpot(std::pair<GlyphKey, Glyph> &glyph, ushort slotWidth)
+bool GlyphTexture::FitInExistingSpot(std::pair<GlyphKey, Glyph> &glyph, uint16 slotWidth)
 {
     for (auto & shelf : shelves)
     {
-        ushort h = glyph.second.rect.h;
+        uint16 h = glyph.second.rect.h;
         if (h >= shelf.minMaxSize.x && h <= shelf.minMaxSize.y)
         {
             bool doesFit = shelf.TryAdd(glyph, slotWidth);
@@ -96,7 +97,7 @@ bool GlyphTexture::FitInExistingSpot(std::pair<GlyphKey, Glyph> &glyph, ushort s
     return false;
 }
 
-Pair GetShelfMinMaxHeight(ushort h, const std::vector<ushort>& delimiters)
+uint2_16 GetShelfMinMaxHeight(uint16 h, const std::vector<uint16>& delimiters)
 {
     if (h <= delimiters[0])
     {
@@ -104,10 +105,10 @@ Pair GetShelfMinMaxHeight(ushort h, const std::vector<ushort>& delimiters)
     }
     else
     {
-        Pair shelfMinMaxHeight {0, 0};
+        uint2_16 shelfMinMaxHeight {0, 0};
         bool delimitersValid = false;
 
-        for (int i = 1; i < delimiters.size(); i++)
+        for (machine i = 1; i < delimiters.size(); i++)
         {
             if (h <= delimiters[i])
             {
@@ -129,18 +130,18 @@ Pair GetShelfMinMaxHeight(ushort h, const std::vector<ushort>& delimiters)
 
 /// creates and adds shelfRect to the shelf
 // todod add several texture handling
-bool GlyphTexture::CreateShelf(std::pair<GlyphKey, Glyph> &glyph, ushort slotWidth)
+bool GlyphTexture::CreateShelf(std::pair<GlyphKey, Glyph> &glyph, uint16 slotWidth)
 {
     auto shelfMinMaxHeight = GetShelfMinMaxHeight(glyph.second.rect.h, shelfDelimiters);
 
-    for (int i = 0; i < freeShelves.size(); i++)
+    for (machine i = 0; i < freeShelves.size(); i++)
     {
-        ushort h = freeShelves[i].y - freeShelves[i].x + 1;
+        uint16 h = freeShelves[i].y - freeShelves[i].x + 1;
         if (shelfMinMaxHeight.y <= h)
         {
-            Pair mainEndPointsArg {0, static_cast<ushort>(dims.x - 1)};
-            auto crossEnd = static_cast<ushort>(freeShelves[i].x + shelfMinMaxHeight.y - 1);
-            Pair crossEndPointsArg {freeShelves[i].x, crossEnd};
+            uint2_16 mainEndPointsArg {0, static_cast<uint16>(dims.x - 1)};
+            auto crossEnd = static_cast<uint16>(freeShelves[i].x + shelfMinMaxHeight.y - 1);
+            uint2_16 crossEndPointsArg {freeShelves[i].x, crossEnd};
             Shelf created {mainEndPointsArg, crossEndPointsArg, shelfMinMaxHeight};
 
             created.TryAdd(glyph, slotWidth);
@@ -159,9 +160,9 @@ bool GlyphTexture::CreateShelf(std::pair<GlyphKey, Glyph> &glyph, ushort slotWid
     return false;
 }
 
-void GlyphTexture::SplitFreeSpace(Pair &freeShelf, ushort splitHeight)
+void GlyphTexture::SplitFreeSpace(uint2_16 &freeShelf, uint16 splitHeight)
 {
-    int occupiedY = freeShelf.x + splitHeight;
+    machine occupiedY = freeShelf.x + splitHeight;
     freeShelf.x = occupiedY;
 }
 
@@ -184,7 +185,7 @@ void GlyphTexture::RemoveUnused()
 
     for (const auto& key : unused)
     {
-        for (int i = 0; i < shelves.size(); i++)
+        for (machine i = 0; i < shelves.size(); i++)
         {
             auto keyRemovedShelfEmpty = shelves[i].TryRemove(key);
             if (keyRemovedShelfEmpty.first)
@@ -208,7 +209,7 @@ void GlyphTexture::RemoveShelf(std::vector<Shelf>::iterator shelfToRemove)
     shelves.erase(shelfToRemove);
 }
 
-void GlyphTexture::ClaimFreeShelf(Pair &freeShelf)
+void GlyphTexture::ClaimFreeShelf(uint2_16 &freeShelf)
 {
     bool isMerged = MergeIntoIfPossible(freeShelf, freeShelves);
     if (!isMerged)
@@ -222,8 +223,8 @@ bool GlyphTexture::Step(std::pair<GlyphKey, Glyph> toPlace)
     GlyphKey &glyphKey = toPlace.first;
     Glyph &glyph = toPlace.second;
 
-    ushort slotWidth = 0;
-    for (ushort widthDelimiter : widthDelimiters)
+    uint16 slotWidth = 0;
+    for (uint16 widthDelimiter : widthDelimiters)
     {
         if (glyph.rect.w <= widthDelimiter)
         {
@@ -281,9 +282,9 @@ std::map<GlyphKey, Glyph>& GlyphTexture::GetGlyphs()
 std::pair<std::vector<Rect>, std::vector<Rect>> GlyphTexture::GetFreeShelfSlotSpace() const
 {
     std::vector<Rect> freeShelfRects (freeShelves.size());
-    for (int i = 0; i < freeShelfRects.size(); i++)
+    for (machine i = 0; i < freeShelfRects.size(); i++)
     {
-        auto height = static_cast<ushort>(freeShelves[i].y - freeShelves[i].x + 1);
+        auto height = static_cast<uint16>(freeShelves[i].y - freeShelves[i].x + 1);
         freeShelfRects[i] = Rect {0, freeShelves[i].x, dims.x, height};
     }
 

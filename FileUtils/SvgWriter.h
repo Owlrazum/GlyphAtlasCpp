@@ -18,7 +18,7 @@ private:
     std::string opening;
 
     static void WriteGlyphDefault(std::pair<GlyphKey, Glyph> glyph, std::ofstream &out, bool writeKey = false);
-    static void WriteRect(Rect &rect, std::ofstream &out, const std::string &fillColor, ushort borderWidthHalf,
+    static void WriteRect(Rect &rect, std::ofstream &out, const std::string &fillColor, uint16 borderWidthHalf,
                           const std::string &borderColor);
     static void WriteRect(Rect rect, std::ofstream& out, const std::string& color);
 

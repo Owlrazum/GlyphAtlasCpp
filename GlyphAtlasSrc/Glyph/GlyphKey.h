@@ -24,8 +24,10 @@
 
 struct GlyphKey
 {
-    unsigned char fontIndex; // has another meaning when reading testcase
-    ushort glyphIndex;
+    // toask: probably can use char, but do not how to do it correctly, since it would read character, not number
+    uint8 fontIndex;
+
+    char32_t glyphIndex; // not sure whether char32_t is the correct type, but uint32 is causing errors.
 
     [[nodiscard]] std::string ToString() const
     {

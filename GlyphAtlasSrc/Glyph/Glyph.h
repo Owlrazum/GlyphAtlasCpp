@@ -6,7 +6,7 @@
 
 struct Glyph
 {
-    ushort textureId{};
+    uint16 textureId{};
     Rect rect;
 
     void Update(const std::string& serialized)
