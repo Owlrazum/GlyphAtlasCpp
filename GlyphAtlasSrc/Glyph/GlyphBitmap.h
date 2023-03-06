@@ -13,10 +13,9 @@ struct GlyphBitmap
         dims.x = static_cast<uint16>(freeTypeBitmap.width);
         dims.y = static_cast<uint16>(freeTypeBitmap.rows);
         buffer = new uint8[dims.x * dims.y];
-        auto ftBuffer = freeTypeBitmap.buffer;
         for (int i = 0; i < dims.y; i++)
         {
-            memcpy(buffer + i * dims.x, ftBuffer + i * freeTypeBitmap.pitch, dims.x);
+            memcpy(buffer + i * dims.x, freeTypeBitmap.buffer + i * freeTypeBitmap.pitch, dims.x);
         }
     }
 };

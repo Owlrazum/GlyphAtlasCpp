@@ -16,6 +16,11 @@ public:
     FreeTypeWrapper();
     ~FreeTypeWrapper();
 
+    void SetDpi(uint16_2 newDpi)
+    {
+        dpi = newDpi;
+    }
+
     void AddFont(uint8_t fontId)
     {
         AddFont({fontId, 0, defaultFontSize});
@@ -23,11 +28,12 @@ public:
 
     void AddFont(FontKey fontKey);
     FT_Bitmap RenderChar(const FontKey &fontKey, uint32 character);
-    FT_Bitmap RenderGlyphIndex(const FontKey &fontKey, machine glyphIndex);
     FT_Bitmap RenderGlyph(const GlyphKey& key);
 private:
     FT_Library library;
-    std::map<FontKey, FT_Face> facesByFont;
+    uint16_2 dpi {300, 300};
+    std::map<FontFileId, FT_Face> facesByFont;
+    std::map<FontKey, FT_Size> sizesByFontKey; // to use one face with different sizes
     std::vector<FT_Bitmap> createdBitmaps;
 
     FT_Error errorCode;
