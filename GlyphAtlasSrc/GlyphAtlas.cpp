@@ -67,7 +67,7 @@ void GlyphAtlas::Render()
 {
     for (auto& texture : textures)
     {
-        texture.Render(freeTypeWrapper);
+        texture.Render(bitmaps);
     }
 }
 

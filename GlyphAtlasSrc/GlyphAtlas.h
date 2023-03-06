@@ -3,31 +3,13 @@
 #include "Rect.h"
 #include "Glyph.h"
 #include "GlyphKey.h"
+#include "GlyphBitmap.h"
 #include "GlyphTexture.h"
 #include "FontKey.h"
+#include "FreeTypeWrapper.h"
 
 #include <vector>
 #include <map>
-
-struct GlyphBitmap
-{
-    uint16_2 dims;
-    int32 pitch;
-    std::vector<uint8> buffer;
-
-    explicit GlyphBitmap(FT_Bitmap freeTypeBitmap)
-    {
-        dims.x = static_cast<uint16>(freeTypeBitmap.width);
-        dims.y = static_cast<uint16>(freeTypeBitmap.rows);
-        pitch = freeTypeBitmap.pitch;
-        buffer.reserve(dims.x * dims.y);
-        auto ftBuffer = freeTypeBitmap.buffer;
-        for (int i = 0; i < dims.y; i++)
-        {
-            memcpy(buffer.data() + i * pitch, ftBuffer + i * pitch, dims.x);
-        }
-    }
-};
 
 class GlyphAtlas
 {
@@ -39,6 +21,14 @@ public:
         textures = std::vector<GlyphTexture>();
         bitmaps = std::map<GlyphKey, GlyphBitmap>();
     };
+
+    ~GlyphAtlas() // it is not RAII way, but turned out simpler for me, than to properly define GlyphBitmap class.
+    {
+        for (auto bitmap: bitmaps)
+        {
+           delete []bitmap.second.buffer;
+        }
+    }
 
     void InitGlyphDims(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
     void Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);

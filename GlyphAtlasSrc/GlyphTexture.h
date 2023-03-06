@@ -4,7 +4,7 @@
 #include "Shelf.h"
 #include "Glyph.h"
 #include "GlyphKey.h"
-#include "FreeTypeWrapper.h"
+#include "GlyphBitmap.h"
 
 #include <vector>
 #include <locale>
@@ -27,7 +27,7 @@ public:
         textureBuffer = std::vector<uint8>(textureDims.x * textureDims.y);
     }
 
-    void Render(FreeTypeWrapper& freeType);
+    void Render(std::map<GlyphKey, GlyphBitmap> &renderedBitmaps);
     void Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
     void RemoveUnused();
 

@@ -5,21 +5,21 @@
 #include <iterator>
 #include <iostream>
 
-void GlyphTexture::Render(FreeTypeWrapper &freeType)
+void GlyphTexture::Render(std::map<GlyphKey, GlyphBitmap> &renderedBitmaps)
 {
     for (const auto& glyph : placedGlyphs)
     {
-        auto bitmap = freeType.RenderGlyph(glyph.first);
+        auto& bitmap = renderedBitmaps.find(glyph.first)->second;//freeType.RenderGlyph(glyph.first);
         uint16_2 pos = {glyph.second.rect.x, glyph.second.rect.y};
-        machine bitmapRowFlippedStart = bitmap.rows - 1;
+        machine bitmapRowFlippedStart = bitmap.dims.y - 1;
         machine textureRowFlippedStart = dims.y - pos.y - 1;
-        for (machine i = 0; i < bitmap.rows; i++)
+        for (machine i = 0; i < bitmap.dims.y; i++)
         {
             machine bitmapRowFlipped = bitmapRowFlippedStart - i;
-            auto rowStart = bitmap.buffer + bitmapRowFlipped * bitmap.pitch;
+            auto rowStart = bitmap.buffer + bitmapRowFlipped * bitmap.dims.x;
             auto dest = textureBuffer.data() + (textureRowFlippedStart - bitmapRowFlipped ) * dims.x + pos.x;
 
-            memcpy(dest, rowStart, bitmap.pitch);
+            memcpy(dest, rowStart, bitmap.dims.x);
         }
     }
 }
