@@ -46,8 +46,6 @@ void GlyphAtlas::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
 
         textureIndex++;
     }
-
-    RemoveUnused();
 }
 
 void GlyphAtlas::RemoveUnused()

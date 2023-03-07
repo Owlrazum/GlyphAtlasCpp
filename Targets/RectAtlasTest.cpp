@@ -40,7 +40,6 @@ extern "C"
     DLLEXPORT machine Step()
     {
         machine texturesCount = glyphAtlas.Step();
-        glyphAtlas.RemoveUnused();
 
         placedGlyphsByTexture.clear();
         for (machine i = 0; i < texturesCount; i++)
@@ -64,6 +63,11 @@ extern "C"
         }
 
         return texturesCount;
+    }
+
+    DLLEXPORT void RemoveUnused()
+    {
+        glyphAtlas.RemoveUnused();
     }
 
     // x - placed, y - freeShelves, z - freeSlots
@@ -116,6 +120,7 @@ int main()
                 }
             }
         }
+        RemoveUnused();
     }
     passKeysByTestNumber = ReadGlyphKeysByLine(GetTestGlyphKeysPath(0));
 }
