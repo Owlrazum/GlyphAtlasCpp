@@ -40,6 +40,7 @@ extern "C"
     DLLEXPORT machine Step()
     {
         machine texturesCount = glyphAtlas.Step();
+        glyphAtlas.RemoveUnused();
 
         placedGlyphsByTexture.clear();
         for (machine i = 0; i < texturesCount; i++)

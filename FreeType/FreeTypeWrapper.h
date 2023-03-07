@@ -38,5 +38,5 @@ private:
 
     FT_Error errorCode;
 
-    const int32 defaultFontSize = 2 * 64;
+    const int32 defaultFontSize = 22 * 64;
 };

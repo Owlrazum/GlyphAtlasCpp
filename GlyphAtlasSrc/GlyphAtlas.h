@@ -32,6 +32,7 @@ public:
 
     void InitGlyphDims(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
     void Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
+    void RemoveUnused();
 
 // ---- Stepped version: ----
     void InitPass(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);

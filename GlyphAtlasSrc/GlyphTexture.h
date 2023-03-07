@@ -73,8 +73,8 @@ private:
     std::set<GlyphKey> previouslyPlacedGlyphs;
     std::set<GlyphKey> currentlyPlacedGlyphs; // in other words, glyphs that were placed during this iteration.
 
-    const std::vector<uint16> shelfDelimiters;
-    const std::vector<uint16> widthDelimiters;
+    const std::vector<uint16> &shelfDelimiters;
+    const std::vector<uint16> &widthDelimiters;
 
     bool FitInExistingSpot(std::pair<GlyphKey, Glyph> &glyph, uint16 slotWidth);
 

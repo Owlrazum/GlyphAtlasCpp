@@ -16,7 +16,7 @@ void GenerateTestCase(
 
 int main()
 {
-    GenerateTestCase(0, 1, 5, 200);
+    GenerateTestCase(0, 20, 5, 400);
     return 0;
 }
 

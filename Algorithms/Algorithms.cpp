@@ -34,7 +34,7 @@ std::pair<std::vector<uint16>, std::vector<uint16>> CreateDelimitersByDeltas(
 
     bool hasPassedThreshold = false;
     float passedThresholdValue = -1;
-    for (auto i = updateGlyphs.begin() + 2; i != updateGlyphs.end() - 3; i++)
+    for (auto i = updateGlyphs.begin() + 2; i < updateGlyphs.end() - 2; i++)
     {
         if (hasPassedThreshold)
         {
@@ -66,7 +66,7 @@ std::pair<std::vector<uint16>, std::vector<uint16>> CreateDelimitersByDeltas(
     prevDelta = std::max(5.0f, (updateGlyphs.begin() + 1)->second.rect.h - baseValue);
 
     hasPassedThreshold = false;
-    for (auto i = updateGlyphs.begin() + 2; i != updateGlyphs.end() - 3; i++)
+    for (auto i = updateGlyphs.begin() + 2; i < updateGlyphs.end() - 2; i++)
     {
         if (hasPassedThreshold)
         {
@@ -103,10 +103,10 @@ void UpdateDelimitersByDeltas(std::vector<std::pair<GlyphKey, Glyph>> &updateGly
     auto maxH = GetMaxHeight(updateGlyphs);
     if (*(shelfDelimiters.end() - 1) < maxH)
     {
-        shelfDelimiters.emplace_back(static_cast<uint16>(maxH * 1.1f));
+        shelfDelimiters.emplace_back(static_cast<uint16>(maxH));
     }
     if (*(slotDelimiters.end() - 1) < maxW)
     {
-        slotDelimiters.emplace_back(static_cast<uint16>(maxW * 1.1f));
+        slotDelimiters.emplace_back(static_cast<uint16>(maxW));
     }
 }

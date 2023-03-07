@@ -24,6 +24,7 @@ extern "C"
         {
             glyphAtlas.InitGlyphDims(pass);
             glyphAtlas.Update(pass);
+            glyphAtlas.RemoveUnused();
         }
 
         glyphAtlas.Render();
@@ -52,6 +53,7 @@ int main()
     {
         glyphAtlas.InitGlyphDims(pass);
         glyphAtlas.Update(pass);
+        glyphAtlas.RemoveUnused();
     }
 
     glyphAtlas.Render();
