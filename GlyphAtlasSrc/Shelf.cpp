@@ -27,7 +27,7 @@ void Shelf::SplitSlot(uint16_2 &freeSlot, uint16 slotWidth, const GlyphKey &key)
     assert(freeSlot.x < x2);
     usedSlots.insert(std::make_pair(key, uint16_2{freeSlot.x, x2}));
     freeSlot.x = freeSlot.x + slotWidth;
-    assert(freeSlot.x < freeSlot.y);
+    assert(freeSlot.x <= freeSlot.y); // todo think about whether equality should be allowed
 }
 
 const std::vector<uint16_2> &Shelf::GetFreeSlots() const

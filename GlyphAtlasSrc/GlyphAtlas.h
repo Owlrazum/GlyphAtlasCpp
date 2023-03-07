@@ -69,12 +69,7 @@ private:
     std::vector<uint16> shelfDelimiters;
     std::vector<uint16> slotDelimiters;
 
-    void UpdateDelimiters(const std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
-
-    static bool CompareByHeight(const std::pair<GlyphKey, Glyph> &lhs, const std::pair<GlyphKey, Glyph> &rhs)
-    {
-        return lhs.second.rect.h > rhs.second.rect.h;
-    }
+    void UpdateDelimiters(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
 
     // ---- Stepped version ----
     machine stepIndex;

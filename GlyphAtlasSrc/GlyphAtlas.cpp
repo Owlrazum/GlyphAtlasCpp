@@ -1,6 +1,7 @@
 #include "GlyphAtlas.h"
-#include "FileUtils.h"
 
+#include "FileUtils.h"
+#include "Algorithms.h"
 #include <iostream>
 
 // Currently renders and discards buffer.
@@ -29,7 +30,6 @@ void GlyphAtlas::InitGlyphDims(std::vector<std::pair<GlyphKey, Glyph>> &updateGl
 
 void GlyphAtlas::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
 {
-    std::sort(updateGlyphs.begin(), updateGlyphs.end(), CompareByHeight);
     UpdateDelimiters(updateGlyphs);
 
     machine textureIndex = 0;
@@ -53,13 +53,19 @@ void GlyphAtlas::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
     }
 }
 
-// todo: improve by developing an algorithm for determining delimiters
-void GlyphAtlas::UpdateDelimiters(const std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
+void GlyphAtlas::UpdateDelimiters(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
 {
+//    default values
+//    shelfDelimiters = {16, 32, 64};
+//    slotDelimiters = {16, 32, 48, 64, 96};
+
     if (shelfDelimiters.empty() || slotDelimiters.empty())
     {
-        shelfDelimiters = {16, 32, 64};
-        slotDelimiters = {16, 32, 48, 64, 96};
+        std::tie(shelfDelimiters, slotDelimiters) = CreateDelimitersByDeltas(updateGlyphs);
+    }
+    else
+    {
+        UpdateDelimitersByDeltas(updateGlyphs, shelfDelimiters, slotDelimiters);
     }
 }
 
@@ -90,7 +96,6 @@ void GlyphAtlas::InitPass(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
 {
     InitGlyphDims(updateGlyphs);
     queue = updateGlyphs;
-    std::sort(queue.begin(), queue.end(), CompareByHeight);
     UpdateDelimiters(queue);
     stepIndex = 0;
 }

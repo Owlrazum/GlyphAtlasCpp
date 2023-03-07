@@ -16,5 +16,6 @@ add_subdirectory(FileUtils)
 add_subdirectory(Math)
 add_subdirectory(FreeType)
 add_subdirectory(SimdUtf)
+add_subdirectory(Algorithms)
 
 #set_target_properties(GlyphAtlasSrc PROPERTIES BUNDLE TRUE)

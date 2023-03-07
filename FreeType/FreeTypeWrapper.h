@@ -31,12 +31,12 @@ public:
     FT_Bitmap RenderGlyph(const GlyphKey& key);
 private:
     FT_Library library;
-    uint16_2 dpi {300, 300};
+    uint16_2 dpi {220, 220};
     std::map<FontFileId, FT_Face> facesByFont;
     std::map<FontKey, FT_Size> sizesByFontKey; // to use one face with different sizes
     std::vector<FT_Bitmap> createdBitmaps;
 
     FT_Error errorCode;
 
-    const int32 defaultFontSize = 16 * 64;
+    const int32 defaultFontSize = 2 * 64;
 };
