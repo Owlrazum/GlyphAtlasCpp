@@ -4,6 +4,14 @@
 
 extern "C" typedef struct CRect
 {
+    bool operator<(const CRect &rhs) const;
+
+    bool operator>(const CRect &rhs) const;
+
+    bool operator<=(const CRect &rhs) const;
+
+    bool operator>=(const CRect &rhs) const;
+
     uint16 x;
     uint16 y;
     uint16 w;
@@ -22,8 +30,6 @@ struct Rect : CRect
 
     [[nodiscard]] uint32 GetArea() const
     { return w * h; }
-
-    void Update(uint16 xArg, uint16 yArg, uint16 wArg, uint16 hArg);
 
     [[nodiscard]] std::string ToString() const;
 };

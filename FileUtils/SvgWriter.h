@@ -3,7 +3,6 @@
 #include "Rect.h"
 #include "Colors.h"
 #include "Glyph.h"
-#include "GlyphAtlas.h"
 
 #include <string>
 

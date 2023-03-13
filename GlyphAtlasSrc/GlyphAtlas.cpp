@@ -4,6 +4,22 @@
 #include "Algorithms.h"
 #include <iostream>
 
+void GlyphAtlas::UpdateDelimiters(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
+{
+//    default values
+//    shelfDelimiters = {16, 32, 64};
+//    slotDelimiters = {16, 32, 48, 64, 96};
+
+    if (shelfDelimiters.empty() || slotDelimiters.empty())
+    {
+        std::tie(shelfDelimiters, slotDelimiters) = CreateDelimitersByDeltas(updateGlyphs);
+    }
+    else
+    {
+        UpdateDelimitersByDeltas(updateGlyphs, shelfDelimiters, slotDelimiters);
+    }
+}
+
 // Currently renders and discards buffer.
 // todo: try to improve performance by finding freetype function to compute bbox
 void GlyphAtlas::InitGlyphDims(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
@@ -50,25 +66,11 @@ void GlyphAtlas::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
 
 void GlyphAtlas::RemoveUnused()
 {
+    machine textureIndex = 0;
     for (auto & texture : textures)
     {
         texture.RemoveUnused();
-    }
-}
-
-void GlyphAtlas::UpdateDelimiters(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
-{
-//    default values
-//    shelfDelimiters = {16, 32, 64};
-//    slotDelimiters = {16, 32, 48, 64, 96};
-
-    if (shelfDelimiters.empty() || slotDelimiters.empty())
-    {
-        std::tie(shelfDelimiters, slotDelimiters) = CreateDelimitersByDeltas(updateGlyphs);
-    }
-    else
-    {
-        UpdateDelimitersByDeltas(updateGlyphs, shelfDelimiters, slotDelimiters);
+        textureIndex++;
     }
 }
 
@@ -78,82 +80,4 @@ void GlyphAtlas::Render()
     {
         texture.Render(bitmaps);
     }
-}
-
-Glyph GlyphAtlas::GetGlyph(GlyphKey key)
-{
-    Glyph glyph;
-    for (auto t : textures)
-    {
-        if (t.GetGlyph(key, glyph))
-        {
-            return glyph;
-        }
-    }
-
-    throw std::out_of_range("The GlyphKey does not exists in the atlas!");
-}
-
-// todo: read glyph rects using freetype
-void GlyphAtlas::InitPass(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
-{
-    InitGlyphDims(updateGlyphs);
-    queue = updateGlyphs;
-    UpdateDelimiters(queue);
-    stepIndex = 0;
-}
-
-machine GlyphAtlas::Step()
-{
-    auto toStep = queue[stepIndex];
-    machine textureIndex = 0;
-    bool wasPlaced;
-    do
-    {
-        if (textureIndex == textures.size())
-        {
-            textures.emplace_back(
-                    shelfDelimiters, slotDelimiters,
-                    textureMaxDims, textures.size());
-        }
-        wasPlaced = textures[textureIndex].Step(toStep);
-        textureIndex++;
-    }
-    while(!wasPlaced);
-
-    stepIndex++;
-    return static_cast<int> (textures.size());
-}
-
-bool GlyphAtlas::ContainsGlyph(const GlyphKey &key) const
-{
-    if (std::any_of(textures.begin(), textures.end(),
-                    [key](const GlyphTexture& t){ return t.ContainsGlyph(key); }))
-    {
-        return true;
-    }
-    return false;
-}
-
-bool GlyphAtlas::MarkIfContainsGlyph(const GlyphKey &key)
-{
-    for (auto texture : textures)
-    {
-        if (texture.ContainsGlyph(key))
-        {
-            texture.MarkGlyph(key);
-            return true;
-        }
-    }
-    return false;
-}
-
-machine GlyphAtlas::GetPlacedGlyphsCount() const
-{
-    machine placedGlyphsCount = 0;
-    for (auto t : textures)
-    {
-        placedGlyphsCount += t.GetGlyphCount();
-    }
-    return placedGlyphsCount;
 }

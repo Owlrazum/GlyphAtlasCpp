@@ -5,8 +5,8 @@
 
 struct GlyphBitmap
 {
-    uint16_2 dims;
-    uint8* buffer;
+    uint16_2 dims{};
+    uint8* buffer{};
 
     explicit GlyphBitmap(FT_Bitmap freeTypeBitmap)
     {

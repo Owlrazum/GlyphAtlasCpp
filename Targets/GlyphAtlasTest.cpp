@@ -3,10 +3,10 @@
 #include "CppExport.h"
 
 #include <vector>
+#include <iostream>
 
-FreeTypeWrapper freeType;
 uint16_2 maxTextureDims = {512, 512};
-GlyphAtlas glyphAtlas = GlyphAtlas(maxTextureDims);
+GlyphAtlas glyphAtlasStepped = GlyphAtlas(maxTextureDims);
 
 struct AtlasTextures
 {
@@ -22,19 +22,19 @@ extern "C"
         auto testCase = ReadGlyphKeysByLine(GetTestGlyphKeysPath(testNumber));
         for (auto& pass : testCase)
         {
-            glyphAtlas.InitGlyphDims(pass);
-            glyphAtlas.Update(pass);
-            glyphAtlas.RemoveUnused();
+            glyphAtlasStepped.InitGlyphDims(pass);
+            glyphAtlasStepped.Update(pass);
+            glyphAtlasStepped.RemoveUnused();
         }
 
-        glyphAtlas.Render();
+        glyphAtlasStepped.Render();
 
-        auto texturesCount = glyphAtlas.GetTexturesCount();
+        auto texturesCount = glyphAtlasStepped.GetTexturesCount();
         atlasTextures->count = texturesCount;
         atlasTextures->textures = new uint8*[texturesCount];
         for (machine i = 0; i < texturesCount; i++)
         {
-            atlasTextures->textures[i] = glyphAtlas.GetTextureBuffer(i);
+            atlasTextures->textures[i] = glyphAtlasStepped.GetTextureBuffer(i);
         }
     }
 
@@ -49,12 +49,18 @@ extern "C"
 int main()
 {
     auto testCase = ReadGlyphKeysByLine(GetTestGlyphKeysPath(0));
+    int passNumber = 0;
     for (auto& pass : testCase)
     {
-        glyphAtlas.InitGlyphDims(pass);
-        glyphAtlas.Update(pass);
-        glyphAtlas.RemoveUnused();
+        glyphAtlasStepped.InitGlyphDims(pass);
+        glyphAtlasStepped.Update(pass);
+        if (passNumber == 2)
+        {
+            std::cout<<"p=2";
+        }
+        glyphAtlasStepped.RemoveUnused();
+        passNumber++;
     }
 
-    glyphAtlas.Render();
+    glyphAtlasStepped.Render();
 }

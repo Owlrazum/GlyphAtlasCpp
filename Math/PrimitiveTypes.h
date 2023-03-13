@@ -89,6 +89,30 @@ struct uint16_2
     {
         return out << pair.x << " " << pair.y;
     }
+
+    bool operator<(const uint16_2 &rhs) const
+    {
+        if (x < rhs.x)
+            return true;
+        if (rhs.x < x)
+            return false;
+        return y < rhs.y;
+    }
+
+    bool operator>(const uint16_2 &rhs) const
+    {
+        return rhs < *this;
+    }
+
+    bool operator<=(const uint16_2 &rhs) const
+    {
+        return !(rhs < *this);
+    }
+
+    bool operator>=(const uint16_2 &rhs) const
+    {
+        return !(*this < rhs);
+    }
 };
 
 struct uint16_3

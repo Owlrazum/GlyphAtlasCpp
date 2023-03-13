@@ -1,6 +1,6 @@
 #include "GlyphTexture.h"
 
-#include "EndPoints.h"
+#include "Algorithms.h"
 #include <algorithm>
 #include <iterator>
 #include <iostream>
@@ -22,6 +22,11 @@ void GlyphTexture::Render(std::map<GlyphKey, GlyphBitmap> &renderedBitmaps)
             memcpy(dest, rowStart, bitmap.dims.x);
         }
     }
+}
+
+bool GlyphTexture::ContainsGlyph(const GlyphKey &key) const
+{
+    return placedGlyphs.find(key) != placedGlyphs.end();
 }
 
 /// Erases glyphs that are placed from glyphs argument;
@@ -76,6 +81,11 @@ void GlyphTexture::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
             continue;
         }
     }
+
+    for (auto& shelf : shelves)
+    {
+        shelf.CheckIntegrity();
+    }
 }
 
 /// returns whether appropriate spot was found
@@ -89,6 +99,7 @@ bool GlyphTexture::FitInExistingSpot(std::pair<GlyphKey, Glyph> &glyph, uint16 s
             bool doesFit = shelf.TryAdd(glyph, slotWidth);
             if (doesFit)
             {
+                shelf.CheckIntegrity();
                 return true;
             }
         }
@@ -175,15 +186,16 @@ void GlyphTexture::RemoveUnused()
         return;
     }
 
-    std::set<GlyphKey> unused;
+    std::vector<GlyphKey> unusedKeys;
+
     std::set_difference(previouslyPlacedGlyphs.begin(), previouslyPlacedGlyphs.end(),
                         currentlyPlacedGlyphs.begin(), currentlyPlacedGlyphs.end(),
-                        std::inserter(unused, unused.begin()));
+                        std::inserter(unusedKeys, unusedKeys.begin()));
 
     previouslyPlacedGlyphs = currentlyPlacedGlyphs;
     currentlyPlacedGlyphs.clear();
 
-    for (const auto& key : unused)
+    for (const auto& key : unusedKeys)
     {
         for (machine i = 0; i < shelves.size(); i++)
         {
@@ -199,8 +211,6 @@ void GlyphTexture::RemoveUnused()
         }
         placedGlyphs.erase(key);
     }
-
-    std::cout << "BAM!" << "\n";
 }
 
 void GlyphTexture::RemoveShelf(std::vector<Shelf>::iterator shelfToRemove)
@@ -216,86 +226,4 @@ void GlyphTexture::ClaimFreeShelf(uint16_2 &freeShelf)
     {
         freeShelves.push_back(freeShelf);
     }
-}
-
-bool GlyphTexture::Step(std::pair<GlyphKey, Glyph> toPlace)
-{
-    GlyphKey &glyphKey = toPlace.first;
-    Glyph &glyph = toPlace.second;
-
-    uint16 slotWidth = 0;
-    for (uint16 widthDelimiter : widthDelimiters)
-    {
-        if (glyph.rect.w <= widthDelimiter)
-        {
-            slotWidth = widthDelimiter;
-            break;
-        }
-    }
-    if (slotWidth == 0)
-    {
-        throw std::out_of_range("The shelfRect width too large to fit into just created shelf");
-    }
-
-    if (ContainsGlyph(glyphKey))
-    {
-        glyph.textureId = id;
-        currentlyPlacedGlyphs.insert(glyphKey);
-        return true;
-    }
-
-    bool found = FitInExistingSpot(toPlace, slotWidth);
-    if (found)
-    {
-        placedGlyphs.insert(toPlace);
-        currentlyPlacedGlyphs.insert(glyphKey);
-        return true;
-    }
-
-    bool wasPlaced = CreateShelf(toPlace, slotWidth);
-    if (wasPlaced)
-    {
-        placedGlyphs.insert(toPlace);
-        currentlyPlacedGlyphs.insert(glyphKey);
-        return true;
-    }
-
-    return false;
-}
-
-bool GlyphTexture::GetGlyph(GlyphKey key, Glyph &glyph)
-{
-    if (auto search = placedGlyphs.find(key); search != placedGlyphs.end())
-    {
-        glyph = search->second;
-        return true;
-    }
-
-    return false;
-}
-
-std::map<GlyphKey, Glyph>& GlyphTexture::GetGlyphs()
-{
-    return placedGlyphs;
-}
-
-std::pair<std::vector<Rect>, std::vector<Rect>> GlyphTexture::GetFreeShelfSlotSpace() const
-{
-    std::vector<Rect> freeShelfRects (freeShelves.size());
-    for (machine i = 0; i < freeShelfRects.size(); i++)
-    {
-        auto height = static_cast<uint16>(freeShelves[i].y - freeShelves[i].x + 1);
-        freeShelfRects[i] = Rect {0, freeShelves[i].x, dims.x, height};
-    }
-
-    std::vector<Rect> freeSlots;
-    for (const Shelf & shelf : shelves)
-    {
-        auto shelfFreeSlots = shelf.GetFreeSlots();
-        for (auto freeSlotX : shelfFreeSlots)
-        {
-            freeSlots.emplace_back(freeSlotX.x, shelf.crossEndPoints.x, freeSlotX.y - freeSlotX.x + 1, shelf.minMaxSize.y);
-        }
-    }
-    return std::make_pair(freeShelfRects, freeSlots);
 }

@@ -69,7 +69,6 @@ std::vector<std::vector<std::pair<GlyphKey, Glyph>>> ReadGlyphKeysByLine(const s
     uint8 fontIndex;
     char32_t glyphCharacter;
     char buffer[4];
-    char bufferChar;
     while (std::getline(in, line))
     {
         std::basic_istringstream<char> ss{line};

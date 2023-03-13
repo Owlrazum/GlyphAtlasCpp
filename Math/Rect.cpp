@@ -27,10 +27,34 @@ Rect::Rect(uint16 xArg, uint16 yArg, uint16 wArg, uint16 hArg) : CRect()
     h = hArg;
 }
 
-void Rect::Update(uint16 xArg, uint16 yArg, uint16 wArg, uint16 hArg)
+bool CRect::operator<(const CRect &rhs) const
 {
-    this->x = xArg;
-    this->y = yArg;
-    this->w = wArg;
-    this->h = hArg;
+    if (x < rhs.x)
+        return true;
+    if (rhs.x < x)
+        return false;
+    if (y < rhs.y)
+        return true;
+    if (rhs.y < y)
+        return false;
+    if (w < rhs.w)
+        return true;
+    if (rhs.w < w)
+        return false;
+    return h < rhs.h;
+}
+
+bool CRect::operator>(const CRect &rhs) const
+{
+    return rhs < *this;
+}
+
+bool CRect::operator<=(const CRect &rhs) const
+{
+    return !(rhs < *this);
+}
+
+bool CRect::operator>=(const CRect &rhs) const
+{
+    return !(*this < rhs);
 }

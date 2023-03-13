@@ -17,12 +17,11 @@ public:
     explicit GlyphAtlas(uint16_2 textureMaxDimsArg)
             : textureMaxDims(textureMaxDimsArg)
     {
-        stepIndex = 0;
         textures = std::vector<GlyphTexture>();
         bitmaps = std::map<GlyphKey, GlyphBitmap>();
     };
 
-    ~GlyphAtlas() // it is not RAII way, but turned out simpler for me, than to properly define GlyphBitmap class.
+    virtual ~GlyphAtlas() // it is not RAII way, but turned out simpler for me, than to properly define GlyphBitmap class.
     {
         for (auto bitmap: bitmaps)
         {
@@ -33,32 +32,12 @@ public:
     void InitGlyphDims(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
     void Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
     void RemoveUnused();
-
-// ---- Stepped version: ----
-    void InitPass(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
-    machine Step(); // returns number of used textures
     void Render();
 
-// ---- Getters: ----
+    uint32 GetTexturesCount() { return textures.size(); }
+    uint8* GetTextureBuffer(machine textureId){ return textures[textureId].GetRawBuffer(); }
 
-    uint8* GetTextureBuffer(machine textureId)
-    {
-        return textures[textureId].GetRawBuffer();
-    }
-
-    [[nodiscard]] bool ContainsGlyph(const GlyphKey& key) const;
-    [[nodiscard]] bool MarkIfContainsGlyph(const GlyphKey& key);
-    [[nodiscard]] Glyph GetGlyph(GlyphKey key);
-    [[nodiscard]] machine GetPlacedGlyphsCount() const;
-
-    [[nodiscard]] std::map<GlyphKey, Glyph> GetGlyphsFromTexture(machine textureId)
-        { return textures[textureId].GetGlyphs(); }
-    [[nodiscard]] std::pair<std::vector<Rect>, std::vector<Rect>> GetFreeShelfSlotSpace(machine textureId) const // the first vector is freeSpace for the shelves
-        { return textures[textureId].GetFreeShelfSlotSpace(); }
-    machine GetTexturesCount()
-        { return static_cast<int>(textures.size()); }
-
-private:
+protected:
     uint16_2 textureMaxDims;
     FreeTypeWrapper freeTypeWrapper;
 
@@ -66,13 +45,8 @@ private:
 
     std::map<GlyphKey, GlyphBitmap> bitmaps;
 
-
     std::vector<uint16> shelfDelimiters;
     std::vector<uint16> slotDelimiters;
 
     void UpdateDelimiters(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
-
-    // ---- Stepped version ----
-    machine stepIndex;
-    std::vector<std::pair<GlyphKey, Glyph>> queue;
 };

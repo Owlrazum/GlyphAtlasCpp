@@ -1,6 +1,5 @@
 target_sources(TestGenerator
                PRIVATE
-               SvgWriter.cpp
                FileUtils.cpp
                )
 target_include_directories(TestGenerator PRIVATE .)
@@ -31,5 +30,6 @@ target_include_directories(GlyphAtlasTest PRIVATE .)
 
 target_sources(GlyphAtlasTestTest
                PRIVATE
-               FileUtils.cpp)
+               FileUtils.cpp
+               )
 target_include_directories(GlyphAtlasTestTest PRIVATE .)
