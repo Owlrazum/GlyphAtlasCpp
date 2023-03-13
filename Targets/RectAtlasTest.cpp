@@ -12,26 +12,25 @@ struct int32_2
 
 extern "C"
 {
-DLLEXPORT machine InitTest(machine testNumber);
-// returns updateStepsCount
-DLLEXPORT machine InitUpdatePass(machine passNumber);
-// returns textureCount;
+DLLEXPORT int32 InitTest(int32 testNumber);
+DLLEXPORT int32 InitUpdatePass(int32 passNumber);
 DLLEXPORT void UpdateStep();
-// return removePlacedStepsCount
-DLLEXPORT int32 InitRemovePlacedPass();
-DLLEXPORT CRect RemovePlacedStep();
-// returns getModifiedFreeStepsCount
-DLLEXPORT int32 InitGetModifiedFreePass();
-DLLEXPORT CRect GetModifiedFreeStep();
+
 DLLEXPORT int32 GetTexturesCount();
 DLLEXPORT void PreparePlacedByTextureBuffer();
-DLLEXPORT void PrepareFreeByTextureBuffer();
 DLLEXPORT int32 GetPlacedCount(int32 textureId);
-// x - placed, y - freeShelves, z - freeSlots
-DLLEXPORT int32_2 GetFreeCounts(int32 textureId);
 DLLEXPORT CRect GetPlacedGlyph(int32 textureId, int32 glyphIndex);
+
+DLLEXPORT void PrepareFreeByTextureBuffer();
+DLLEXPORT int32_2 GetFreeCounts(int32 textureId);
 DLLEXPORT CRect GetFreeShelfRect(int32 textureId, int32 freeShelfIndex);
 DLLEXPORT CRect GetFreeSlotRect(int32 textureId, int32 freeSlotIndex);
+
+DLLEXPORT int32 InitGetModifiedFreePass();
+DLLEXPORT CRect GetModifiedFreeStep();
+
+DLLEXPORT int32 InitRemovePlacedPass();
+DLLEXPORT CRect RemovePlacedStep();
 }
 
 uint16_2 maxTextureDims = {512, 512};
@@ -55,8 +54,8 @@ int main()
     auto passCount = InitTest(0);
     for (int p = 0; p < passCount; p++)
     {
-        auto stepsCount = InitUpdatePass(p);
-        for (machine s = 0; s < stepsCount; s++)
+        auto updateStepsCount = InitUpdatePass(p);
+        for (machine s = 0; s < updateStepsCount; s++)
         {
             CheckStep();
         }
@@ -126,13 +125,13 @@ void CheckGetPlacedGlyph()
     }
 }
 
-machine InitTest(machine testNumber)
+int32 InitTest(int32 testNumber)
 {
     passKeysByTestNumber = ReadGlyphKeysByLine(GetTestGlyphKeysPath(testNumber));
     return static_cast<int>(passKeysByTestNumber.size());
 }
 
-machine InitUpdatePass(machine passNumber)
+int32 InitUpdatePass(int32 passNumber)
 {
     auto keys = passKeysByTestNumber[passNumber];
     glyphAtlasStepped.InitPass(keys);
