@@ -11,7 +11,7 @@ bool GlyphTextureStepped::UpdateStep(std::pair<GlyphKey, Glyph> toPlace)
     Glyph &glyph = toPlace.second;
 
     uint16 slotWidth = 0;
-    for (uint16 widthDelimiter : widthDelimiters)
+    for (uint16 widthDelimiter : widthDelimiters.get())
     {
         if (glyph.rect.w <= widthDelimiter)
         {
@@ -120,16 +120,7 @@ std::pair<std::vector<Rect>, std::vector<Rect>> GlyphTextureStepped::GetFreeShel
     return std::make_pair(freeShelfRects, freeSlots);
 }
 
-void GlyphTextureStepped::RecordFreeShelfSlotSpace()
-{
-    prevFreeShelfSlotSpace = GetFreeShelfSlotSpace();
-
-    //we should sort so set_difference will work
-    std::sort(prevFreeShelfSlotSpace.first.begin(), prevFreeShelfSlotSpace.first.end());
-    std::sort(prevFreeShelfSlotSpace.second.begin(), prevFreeShelfSlotSpace.second.end());
-}
-
-std::vector<Rect> GlyphTextureStepped::GetModifiedFreeRects() const
+std::vector<Rect> GlyphTextureStepped::GetModifiedFreeRects()
 {
     std::vector<Rect> removedShelves;
     std::vector<Rect> removedSlots;
@@ -137,6 +128,7 @@ std::vector<Rect> GlyphTextureStepped::GetModifiedFreeRects() const
     auto freeShelfSlotSpace = GetFreeShelfSlotSpace();
     std::sort(freeShelfSlotSpace.first.begin(), freeShelfSlotSpace.first.end());
     std::sort(freeShelfSlotSpace.second.begin(), freeShelfSlotSpace.second.end());
+
     std::set_difference(prevFreeShelfSlotSpace.first.begin(), prevFreeShelfSlotSpace.first.end(),
                         freeShelfSlotSpace.first.begin(), freeShelfSlotSpace.first.end(),
                         std::inserter(removedShelves, removedShelves.begin()));
@@ -146,5 +138,7 @@ std::vector<Rect> GlyphTextureStepped::GetModifiedFreeRects() const
                         std::inserter(removedSlots, removedSlots.begin()));
 
     removedShelves.insert(removedShelves.end(), removedSlots.begin(), removedSlots.end());
+    prevFreeShelfSlotSpace.first = freeShelfSlotSpace.first;
+    prevFreeShelfSlotSpace.second = freeShelfSlotSpace.second;
     return removedShelves;
 }

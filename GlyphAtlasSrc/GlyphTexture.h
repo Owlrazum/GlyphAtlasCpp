@@ -31,6 +31,7 @@ public:
     void Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
     void RemoveUnused();
     unsigned char* GetRawBuffer() { return textureBuffer.data(); }
+    bool IsEmpty() { return placedGlyphs.empty(); }
 
 protected:
     uint16_2 dims;
@@ -46,8 +47,8 @@ protected:
     std::set<GlyphKey> previouslyPlacedGlyphs;
     std::set<GlyphKey> currentlyPlacedGlyphs; // in other words, glyphs that were placed during this iteration.
 
-    const std::vector<uint16> &shelfDelimiters;
-    const std::vector<uint16> &widthDelimiters;
+    std::reference_wrapper<std::vector<uint16>> shelfDelimiters;
+    std::reference_wrapper<std::vector<uint16>> widthDelimiters;
 
     [[nodiscard]] bool ContainsGlyph(const GlyphKey &key) const;
     bool FitInExistingSpot(std::pair<GlyphKey, Glyph> &glyph, uint16 slotWidth);

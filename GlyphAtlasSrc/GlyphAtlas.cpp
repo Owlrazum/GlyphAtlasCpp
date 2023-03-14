@@ -66,11 +66,13 @@ void GlyphAtlas::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
 
 void GlyphAtlas::RemoveUnused()
 {
-    machine textureIndex = 0;
-    for (auto & texture : textures)
+    for (machine i = 0; i < textures.size(); i++)
     {
-        texture.RemoveUnused();
-        textureIndex++;
+        textures[i].RemoveUnused();
+        if (textures[i].IsEmpty())
+        {
+            textures.erase(textures.begin() + i);
+        }
     }
 }
 

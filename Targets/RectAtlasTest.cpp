@@ -140,7 +140,7 @@ int32 InitUpdatePass(int32 passNumber)
 
 void UpdateStep()
 {
-    glyphAtlasStepped.RecordFreeShelfSlotSpace();
+//    glyphAtlasStepped.RecordFreeShelfSlotSpace();
     glyphAtlasStepped.UpdateStep();
 }
 
@@ -177,7 +177,8 @@ void PreparePlacedByTextureBuffer()
     for (machine i = 0; i < texturesCount; i++)
     {
         auto textureGlyphsMap = glyphAtlasStepped.GetGlyphsFromTexture(i);
-        std::vector<std::pair<GlyphKey, Glyph>> textureGlyphs(textureGlyphsMap.size());
+        std::vector<std::pair<GlyphKey, Glyph>> textureGlyphs;
+        textureGlyphs.reserve(textureGlyphsMap.size());
         for (auto pair: textureGlyphsMap)
         {
             textureGlyphs.emplace_back(pair);

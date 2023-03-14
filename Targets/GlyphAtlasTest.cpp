@@ -5,36 +5,38 @@
 #include <vector>
 #include <iostream>
 
-uint16_2 maxTextureDims = {512, 512};
-GlyphAtlas glyphAtlasStepped = GlyphAtlas(maxTextureDims);
-
-struct AtlasTextures
+namespace GlyphAtlasTest
 {
-    uint8 **textures;
-    machine count;
-};
+    uint16_2 maxTextureDims = {512, 512};
+    GlyphAtlas glyphAtlas = GlyphAtlas(maxTextureDims);
 
-extern "C"
-{
+    struct AtlasTextures
+    {
+        uint8 **textures;
+        machine count;
+    };
+
+    extern "C"
+    {
     // returns number of glyphs
     DLLEXPORT void RenderAtlasTextures(AtlasTextures* atlasTextures, machine testNumber)
     {
         auto testCase = ReadGlyphKeysByLine(GetTestGlyphKeysPath(testNumber));
         for (auto& pass : testCase)
         {
-            glyphAtlasStepped.InitGlyphDims(pass);
-            glyphAtlasStepped.Update(pass);
-            glyphAtlasStepped.RemoveUnused();
+            glyphAtlas.InitGlyphDims(pass);
+            glyphAtlas.Update(pass);
+            glyphAtlas.RemoveUnused();
         }
 
-        glyphAtlasStepped.Render();
+        glyphAtlas.Render();
 
-        auto texturesCount = glyphAtlasStepped.GetTexturesCount();
+        auto texturesCount = glyphAtlas.GetTexturesCount();
         atlasTextures->count = texturesCount;
         atlasTextures->textures = new uint8*[texturesCount];
         for (machine i = 0; i < texturesCount; i++)
         {
-            atlasTextures->textures[i] = glyphAtlasStepped.GetTextureBuffer(i);
+            atlasTextures->textures[i] = glyphAtlas.GetTextureBuffer(i);
         }
     }
 
@@ -44,6 +46,7 @@ extern "C"
         // So no need to free them.
         delete atlasTextures->textures;
     }
+    }
 }
 
 int main()
@@ -52,15 +55,15 @@ int main()
     int passNumber = 0;
     for (auto& pass : testCase)
     {
-        glyphAtlasStepped.InitGlyphDims(pass);
-        glyphAtlasStepped.Update(pass);
+        GlyphAtlasTest::glyphAtlas.InitGlyphDims(pass);
+        GlyphAtlasTest::glyphAtlas.Update(pass);
         if (passNumber == 2)
         {
             std::cout<<"p=2";
         }
-        glyphAtlasStepped.RemoveUnused();
+        GlyphAtlasTest::glyphAtlas.RemoveUnused();
         passNumber++;
     }
 
-    glyphAtlasStepped.Render();
+    GlyphAtlasTest::glyphAtlas.Render();
 }

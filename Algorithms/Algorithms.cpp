@@ -12,6 +12,16 @@ static bool CompareByWidth(const std::pair<GlyphKey, Glyph> &lhs, const std::pai
     return lhs.second.rect.w < rhs.second.rect.w;
 }
 
+static bool CompareByHeightReverse(const std::pair<GlyphKey, Glyph> &lhs, const std::pair<GlyphKey, Glyph> &rhs)
+{
+    return lhs.second.rect.h > rhs.second.rect.h;
+}
+
+static bool CompareByWidthReverse(const std::pair<GlyphKey, Glyph> &lhs, const std::pair<GlyphKey, Glyph> &rhs)
+{
+    return lhs.second.rect.w > rhs.second.rect.w;
+}
+
 static uint16 GetMaxWidth(const std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
 {
     return std::max_element(updateGlyphs.begin(), updateGlyphs.end(), CompareByWidth)->second.rect.w;
@@ -28,9 +38,8 @@ std::pair<std::vector<uint16>, std::vector<uint16>> CreateDelimitersByDeltas(
 
     std::sort(updateGlyphs.begin(), updateGlyphs.end(), CompareByWidth);
 
-
     float baseValue = updateGlyphs.begin()->second.rect.w;
-    float prevDelta = std::max(5.0f, (updateGlyphs.begin() + 1)->second.rect.w - baseValue);
+    float prevDelta = std::max(5.0f, static_cast<float>((updateGlyphs.begin() + 1)->second.rect.w) - baseValue);
 
     bool hasPassedThreshold = false;
     float passedThresholdValue = -1;
@@ -151,8 +160,8 @@ bool MergeIntoIfPossible(uint16_2 &toMerge, std::vector<uint16_2> &intoContainer
             for (machine i = mergedIndex + 1; i < intoContainer.size(); i++)
             {
                 auto &into = intoContainer[i];
-                assert(merged->y - into.x != 0); // no intersection requirement
-                if (abs(merged->y - into.x) == -1)
+                assert(into.x - merged->y != 0 && into.x - merged->y != -1); // no intersection requirement
+                if (into.x - merged->y == 1)
                 {
                     merged->y = into.y;
                     assert(merged->x <= merged->y);
@@ -166,8 +175,8 @@ bool MergeIntoIfPossible(uint16_2 &toMerge, std::vector<uint16_2> &intoContainer
             for (machine i = mergedIndex + 1; i < intoContainer.size(); i++)
             {
                 auto &into = intoContainer[i];
-                assert(merged->x - into.y != 0); // no intersection requirement
-                if (abs(merged->x - into.y) == 1)
+                assert(merged->x - into.y != 0 && merged->x - into.y != -1); // no intersection requirement
+                if (merged->x - into.y == 1)
                 {
                     merged->x = into.x;
                     assert(merged->x <= merged->y);
@@ -177,93 +186,6 @@ bool MergeIntoIfPossible(uint16_2 &toMerge, std::vector<uint16_2> &intoContainer
                 }
             }
         }
-
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool MergeIntoIfPossibleDebug(uint16_2 &toMerge, std::vector<uint16_2> &intoContainer,
-                              std::map<GlyphKey, uint16_2> &usedContainer, ushort growTarget)
-{
-    uint16_2 *merged = nullptr;
-    machine mergedIndex = 0;
-    bool expandedRight = false;
-    bool expandedLeft = false;
-    for (int i = 0; i < intoContainer.size(); i++)
-    {
-        auto &into = intoContainer[i];
-        assert(toMerge.x != into.y && toMerge.x - into.y != -1); // no intersection requirement
-        if (toMerge.x - into.y == 1)
-        {
-            into.y = toMerge.y;
-            assert(into.x <= into.y);
-            merged = &into;
-            mergedIndex = i;
-            expandedRight = true;
-            break;
-        }
-        assert(toMerge.y != into.x && into.x - toMerge.y != -1); // no intersection requirement
-        if (into.x - toMerge.y == 1)
-        {
-            into.x = toMerge.x;
-            assert(into.x <= into.y);
-            merged = &into;
-            mergedIndex = i;
-            expandedLeft = true;
-            break;
-        }
-    }
-
-    if (merged)
-    {
-        if (expandedRight)
-        {
-            for (machine i = mergedIndex + 1; i < intoContainer.size(); i++)
-            {
-                auto &into = intoContainer[i];
-                assert(merged->y - into.x != 0); // no intersection requirement
-                if (abs(merged->y - into.x) == -1)
-                {
-                    merged->y = into.y;
-                    assert(merged->x <= merged->y);
-                    intoContainer[i] = intoContainer[intoContainer.size() - 1]; // swap and erase last.
-                    intoContainer.erase(intoContainer.end() - 1);
-                    break;
-                }
-            }
-        } else if (expandedLeft)
-        {
-            for (machine i = mergedIndex + 1; i < intoContainer.size(); i++)
-            {
-                auto &into = intoContainer[i];
-                assert(merged->x - into.y != 0); // no intersection requirement
-                if (abs(merged->x - into.y) == 1)
-                {
-                    merged->x = into.x;
-                    assert(merged->x <= merged->y);
-                    intoContainer[i] = intoContainer[intoContainer.size() - 1];
-                    intoContainer.erase(intoContainer.end() - 1);
-                    break;
-                }
-            }
-        }
-
-        std::vector<uint16_2> slots;
-        slots.reserve((intoContainer.size() + usedContainer.size()));
-        for (auto freeSlot : intoContainer)
-        {
-            slots.push_back(freeSlot);
-        }
-        for (auto usedSlot : usedContainer)
-        {
-            slots.push_back(usedSlot.second);
-        }
-
-        CheckContainerIntegrity(slots, growTarget);
 
         return true;
     }

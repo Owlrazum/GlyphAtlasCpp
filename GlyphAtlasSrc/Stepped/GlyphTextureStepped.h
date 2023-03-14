@@ -19,9 +19,9 @@ public:
     bool UpdateStep(std::pair<GlyphKey, Glyph> toPlace);
     std::vector<GlyphKey> CollectUnused();
 
-    void RecordFreeShelfSlotSpace();
+//    void RecordFreeShelfSlotSpace();
     CRect RemoveStep(GlyphKey &keyToRemove);
-    [[nodiscard]] std::vector<Rect> GetModifiedFreeRects() const;
+    [[nodiscard]] std::vector<Rect> GetModifiedFreeRects();
 
 private:
     std::pair<std::vector<Rect>, std::vector<Rect>> prevFreeShelfSlotSpace;

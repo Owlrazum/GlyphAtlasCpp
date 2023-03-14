@@ -18,6 +18,4 @@ void UpdateDelimitersByDeltas(
 
 // Traverses pair to merge into, can reduce the size of the container by one in the insertion to the middle case.
 bool MergeIntoIfPossible(uint16_2 &toMerge, std::vector<uint16_2>& intoContainer);
-bool MergeIntoIfPossibleDebug(uint16_2 &toMerge, std::vector<uint16_2> &intoContainer,
-                              std::map<GlyphKey, uint16_2> &usedContainer, ushort growTarget);
 void CheckContainerIntegrity(std::vector<uint16_2>& container, uint16 growTarget);

@@ -57,6 +57,10 @@ CRect GlyphAtlasStepped::RemovePlacedStep()
 
         GlyphKey keyToRemove = *(removePlacedQueue[i].end() - 1);
         auto rect = steppedTextures[i].RemoveStep(keyToRemove);
+        if (steppedTextures[i].IsEmpty())
+        {
+            steppedTextures.erase(steppedTextures.begin() + i);
+        }
         removePlacedQueue[i].erase(removePlacedQueue[i].end() - 1);
 
         return rect;
@@ -73,7 +77,7 @@ uint32 GlyphAtlasStepped::InitGetModifiedFreePass()
     {
         auto v = t.GetModifiedFreeRects();
         unusedCount += v.size();
-        removeFreeQueue.insert(removeFreeQueue.begin(), v.begin(), v.end());
+        removeFreeQueue.insert(removeFreeQueue.end(), v.begin(), v.end());
     }
     return unusedCount;
 }
@@ -89,12 +93,4 @@ CRect GlyphAtlasStepped::GetModifiedFreeStep()
     }
 
     throw std::out_of_range("Remove step did not find what to remove");
-}
-
-void GlyphAtlasStepped::RecordFreeShelfSlotSpace()
-{
-    for (auto& t : steppedTextures)
-    {
-        t.RecordFreeShelfSlotSpace();
-    }
 }

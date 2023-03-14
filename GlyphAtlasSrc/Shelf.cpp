@@ -25,7 +25,6 @@ bool Shelf::TryAdd(std::pair<GlyphKey, Glyph> &glyph, uint16 slotWidth)
                 freeSlots.erase(freeSlots.begin() + i);
             }
 
-            CheckIntegrity();
             return true;
         }
     }
@@ -42,13 +41,10 @@ std::pair<bool, bool> Shelf:: TryRemove(const GlyphKey &key)
             return std::make_pair(true, true);
         }
 
-        CheckIntegrity();
-
         uint16_2 newFreeSlot = search->second;
         usedSlots.erase(search);
         ClaimFreeSlot(newFreeSlot);
 
-        CheckIntegrity();
         return std::make_pair(true, false);
     }
     return std::make_pair(false, false);
@@ -56,7 +52,7 @@ std::pair<bool, bool> Shelf:: TryRemove(const GlyphKey &key)
 
 void Shelf::ClaimFreeSlot(uint16_2 &newFreeSlot)
 {
-    bool isMerged = MergeIntoIfPossibleDebug(newFreeSlot, freeSlots, usedSlots, mainEndPoints.y + 1);
+    bool isMerged = MergeIntoIfPossible(newFreeSlot, freeSlots);
     if (!isMerged)
     {
         freeSlots.emplace_back(newFreeSlot);
@@ -89,6 +85,7 @@ void Shelf::CheckIntegrity()
     CheckContainerIntegrity(slots, mainEndPoints.y + 1);
 }
 
+// Should be used only as a debug version.
 const std::vector<uint16_2> &Shelf::GetFreeSlots() const
 {
     return freeSlots;

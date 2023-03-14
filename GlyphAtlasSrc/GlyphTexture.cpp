@@ -39,7 +39,7 @@ void GlyphTexture::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
         Glyph &glyph = updateGlyph.second;
 
         uint16 slotWidth = 0;
-        for (uint16 widthDelimiter : widthDelimiters)
+        for (uint16 widthDelimiter : widthDelimiters.get())
         {
             if (glyph.rect.w <= widthDelimiter)
             {
@@ -81,11 +81,6 @@ void GlyphTexture::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
             continue;
         }
     }
-
-    for (auto& shelf : shelves)
-    {
-        shelf.CheckIntegrity();
-    }
 }
 
 /// returns whether appropriate spot was found
@@ -99,7 +94,6 @@ bool GlyphTexture::FitInExistingSpot(std::pair<GlyphKey, Glyph> &glyph, uint16 s
             bool doesFit = shelf.TryAdd(glyph, slotWidth);
             if (doesFit)
             {
-                shelf.CheckIntegrity();
                 return true;
             }
         }
@@ -139,8 +133,6 @@ uint16_2 GetShelfMinMaxHeight(uint16 h, const std::vector<uint16>& delimiters)
     }
 }
 
-/// creates and adds shelfRect to the shelf
-// todod add several texture handling
 bool GlyphTexture::CreateShelf(std::pair<GlyphKey, Glyph> &glyph, uint16 slotWidth)
 {
     auto shelfMinMaxHeight = GetShelfMinMaxHeight(glyph.second.rect.h, shelfDelimiters);

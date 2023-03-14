@@ -15,7 +15,6 @@ public:
 
     void InitPass(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
 
-    void RecordFreeShelfSlotSpace();
     void UpdateStep(); // returns number of used textures
 
     uint32 InitRemovePlacesPass();
