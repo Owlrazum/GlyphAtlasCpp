@@ -13,7 +13,7 @@ public:
         stepIndex = 0;
     };
 
-    void InitPass(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
+    void InitPass(std::vector<std::pair<FontKey, GlyphKey>> &updateKeys);
 
     void UpdateStep(); // returns number of used textures
 

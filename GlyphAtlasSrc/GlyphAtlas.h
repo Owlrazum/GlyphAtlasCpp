@@ -29,21 +29,23 @@ public:
         }
     }
 
-    void InitGlyphDims(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
-    void Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
-    void RemoveUnused();
-    void Render();
+    void Update(std::vector<std::pair<FontKey, GlyphKey>> &updateKeys);
 
     uint32 GetTexturesCount() { return textures.size(); }
     uint8* GetTextureBuffer(machine textureId){ return textures[textureId].GetRawBuffer(); }
 
 protected:
+    std::vector<std::pair<GlyphKey, Glyph>> InitGlyphDims(std::vector<std::pair<FontKey, GlyphKey>> &updateKeys);
+    void PlaceIfAbsent(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
+    void RemoveUnused();
+    void Render();
+
     uint16_2 textureMaxDims;
     FreeTypeWrapper freeTypeWrapper;
 
     std::vector<GlyphTexture> textures; // perhaps one glyphTexture can be referenced by multiple fonts
 
-    std::map<GlyphKey, GlyphBitmap> bitmaps;
+    std::map<GlyphKey, GlyphBitmap> bitmaps; // only primary meaning of GlyphKey.fontId should be used here.
 
     std::vector<uint16> shelfDelimiters;
     std::vector<uint16> slotDelimiters;

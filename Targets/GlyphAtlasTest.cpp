@@ -21,15 +21,11 @@ namespace GlyphAtlasTest
     // returns number of glyphs
     DLLEXPORT void RenderAtlasTextures(AtlasTextures* atlasTextures, machine testNumber)
     {
-        auto testCase = ReadGlyphKeysByLine(GetTestGlyphKeysPath(testNumber));
+        auto testCase = ReadGlyphTestData(GetTestGlyphKeysPath(testNumber));
         for (auto& pass : testCase)
         {
-            glyphAtlas.InitGlyphDims(pass);
             glyphAtlas.Update(pass);
-            glyphAtlas.RemoveUnused();
         }
-
-        glyphAtlas.Render();
 
         auto texturesCount = glyphAtlas.GetTexturesCount();
         atlasTextures->count = texturesCount;
@@ -51,19 +47,11 @@ namespace GlyphAtlasTest
 
 int main()
 {
-    auto testCase = ReadGlyphKeysByLine(GetTestGlyphKeysPath(0));
+    auto testCase = ReadGlyphTestData(GetTestGlyphKeysPath(0));
     int passNumber = 0;
     for (auto& pass : testCase)
     {
-        GlyphAtlasTest::glyphAtlas.InitGlyphDims(pass);
         GlyphAtlasTest::glyphAtlas.Update(pass);
-        if (passNumber == 2)
-        {
-            std::cout<<"p=2";
-        }
-        GlyphAtlasTest::glyphAtlas.RemoveUnused();
         passNumber++;
     }
-
-    GlyphAtlasTest::glyphAtlas.Render();
 }

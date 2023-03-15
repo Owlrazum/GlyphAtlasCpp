@@ -24,6 +24,17 @@ void GlyphTexture::Render(std::map<GlyphKey, GlyphBitmap> &renderedBitmaps)
     }
 }
 
+void GlyphTexture::ClearRectOfTextureBuffer(CRect rect)
+{
+    auto posY = dims.y - rect.y - 1;
+    auto dest = textureBuffer.data() + posY * dims.x + rect.x;
+    for (int i = 0; i < rect.h; i++)
+    {
+        memset(dest, 0, rect.w);
+        dest -= dims.x;
+    }
+}
+
 bool GlyphTexture::ContainsGlyph(const GlyphKey &key) const
 {
     return placedGlyphs.find(key) != placedGlyphs.end();
@@ -201,6 +212,7 @@ void GlyphTexture::RemoveUnused()
                 break;
             }
         }
+        ClearRectOfTextureBuffer(placedGlyphs.find(key)->second.rect);
         placedGlyphs.erase(key);
     }
 }

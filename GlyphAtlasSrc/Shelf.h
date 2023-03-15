@@ -19,9 +19,10 @@ public:
     }
 
     // naming using main and cross similar to flex-box, not tied to vertical or horizontal.
-    uint16_2 mainEndPoints; // poses of start and end, endPoints.y > endPoints.x
+    uint16_2 mainEndPoints;
     uint16_2 crossEndPoints;
-    uint16_2 minMaxSize; // used to not place too short inside shelf.
+
+    uint16_2 minMaxSize; // used to not place too short inside shelf. minMaxSize.y is the same as ToLength(crossEndPoints)
 
     bool TryAdd(std::pair<GlyphKey, Glyph> &glyph, uint16 slotWidth);
     [[nodiscard]] const std::vector<uint16_2>& GetFreeSlots() const;

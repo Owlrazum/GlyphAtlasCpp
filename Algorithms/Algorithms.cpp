@@ -22,15 +22,6 @@ static bool CompareByWidthReverse(const std::pair<GlyphKey, Glyph> &lhs, const s
     return lhs.second.rect.w > rhs.second.rect.w;
 }
 
-static uint16 GetMaxWidth(const std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
-{
-    return std::max_element(updateGlyphs.begin(), updateGlyphs.end(), CompareByWidth)->second.rect.w;
-}
-static uint16 GetMaxHeight(const std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
-{
-    return std::max_element(updateGlyphs.begin(), updateGlyphs.end(), CompareByHeight)->second.rect.h;
-}
-
 std::pair<std::vector<uint16>, std::vector<uint16>> CreateDelimitersByDeltas(
         std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
 {
@@ -104,6 +95,15 @@ std::pair<std::vector<uint16>, std::vector<uint16>> CreateDelimitersByDeltas(
     return std::make_pair(shelfDelimiters, slotDelimiters);
 }
 
+static uint16 GetMaxWidth(const std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
+{
+    return std::max_element(updateGlyphs.begin(), updateGlyphs.end(), CompareByWidth)->second.rect.w;
+}
+static uint16 GetMaxHeight(const std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
+{
+    return std::max_element(updateGlyphs.begin(), updateGlyphs.end(), CompareByHeight)->second.rect.h;
+}
+
 void UpdateDelimitersByDeltas(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs,
                          std::vector<uint16> &shelfDelimiters,
                          std::vector<uint16> &slotDelimiters)
@@ -118,6 +118,16 @@ void UpdateDelimitersByDeltas(std::vector<std::pair<GlyphKey, Glyph>> &updateGly
     {
         slotDelimiters.emplace_back(static_cast<uint16>(maxW));
     }
+}
+
+uint16 ToLength(const uint16_2& endPoints)
+{
+    return endPoints.y - endPoints.x + 1;
+}
+
+uint16_2 ToEndPoints(uint16 start, uint16 length)
+{
+    return {start, static_cast<uint16>(start + length - 1)};
 }
 
 

@@ -37,7 +37,7 @@ uint16_2 maxTextureDims = {512, 512};
 GlyphAtlasStepped glyphAtlasStepped = GlyphAtlasStepped(maxTextureDims);
 
 // the containers are flushed after each step.
-std::vector<std::vector<std::pair<GlyphKey, Glyph>>> passKeysByTestNumber{};
+std::vector<std::vector<std::pair<FontKey, GlyphKey>>> passKeysByTestNumber{};
 std::vector<std::vector<std::pair<GlyphKey, Glyph>>> placedGlyphsByTexture{};
 
 std::vector<std::vector<Rect>> freeShelvesByTexture{};
@@ -64,7 +64,6 @@ int main()
         CheckGetModifiedFree();
         CheckGetFreeFromBuffer();
     }
-    passKeysByTestNumber = ReadGlyphKeysByLine(GetTestGlyphKeysPath(0));
 }
 
 void CheckStep()
@@ -127,7 +126,7 @@ void CheckGetPlacedGlyph()
 
 int32 InitTest(int32 testNumber)
 {
-    passKeysByTestNumber = ReadGlyphKeysByLine(GetTestGlyphKeysPath(testNumber));
+    passKeysByTestNumber = ReadGlyphTestData(GetTestGlyphKeysPath(testNumber));
     return static_cast<int>(passKeysByTestNumber.size());
 }
 

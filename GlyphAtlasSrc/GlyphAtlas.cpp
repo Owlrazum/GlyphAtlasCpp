@@ -4,47 +4,47 @@
 #include "Algorithms.h"
 #include <iostream>
 
-void GlyphAtlas::UpdateDelimiters(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
+void GlyphAtlas::Update(std::vector<std::pair<FontKey, GlyphKey>> &updateKeys)
 {
-//    default values
-//    shelfDelimiters = {16, 32, 64};
-//    slotDelimiters = {16, 32, 48, 64, 96};
-
-    if (shelfDelimiters.empty() || slotDelimiters.empty())
-    {
-        std::tie(shelfDelimiters, slotDelimiters) = CreateDelimitersByDeltas(updateGlyphs);
-    }
-    else
-    {
-        UpdateDelimitersByDeltas(updateGlyphs, shelfDelimiters, slotDelimiters);
-    }
+    auto updateGlyphs = InitGlyphDims(updateKeys);
+    PlaceIfAbsent(updateGlyphs);
+    RemoveUnused();
+    Render();
 }
 
-// Currently renders and discards buffer.
 // todo: try to improve performance by finding freetype function to compute bbox
-void GlyphAtlas::InitGlyphDims(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
+std::vector<std::pair<GlyphKey, Glyph>> GlyphAtlas::InitGlyphDims(std::vector<std::pair<FontKey, GlyphKey>> &updateKeys)
 {
-    for (auto& pair : updateGlyphs)
+    std::vector<std::pair<GlyphKey, Glyph>> updateGlyphs;
+    updateGlyphs.reserve(updateKeys.size());
+    for (auto& pair : updateKeys)
     {
-        freeTypeWrapper.AddFont(pair.first.fontIndex);
-        if (auto search = bitmaps.find(pair.first); search != bitmaps.end())
+        FontKey& fontKey = pair.first;
+        GlyphKey& glyphKey = pair.second;
+        freeTypeWrapper.InitGlyphKey(fontKey, glyphKey);
+        Glyph glyph;
+        if (auto search = bitmaps.find(glyphKey); search != bitmaps.end())
         {
-            pair.second.rect.w = search->second.dims.x;
-            pair.second.rect.h = search->second.dims.y;
+            glyph.rect.w = search->second.dims.x;
+            glyph.rect.h = search->second.dims.y;
         }
         else
         {
-            auto ftBitmap = freeTypeWrapper.RenderGlyph(pair.first);
+            auto ftBitmap = freeTypeWrapper.RenderGlyph(glyphKey); // updates GlyphKey.fontId to be in its primary meaning
             GlyphBitmap bitmap (ftBitmap);
-            bitmaps.insert(std::make_pair(pair.first, bitmap));
-            pair.second.rect.w = bitmap.dims.x;
-            pair.second.rect.h = bitmap.dims.y;
+            bitmaps.insert(std::make_pair(glyphKey, bitmap));
+            glyph.rect.w = bitmap.dims.x;
+            glyph.rect.h = bitmap.dims.y;
         }
+
+        updateGlyphs.emplace_back(glyphKey, glyph);
     }
+
+    return updateGlyphs;
 }
 
 
-void GlyphAtlas::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
+void GlyphAtlas::PlaceIfAbsent(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
 {
     UpdateDelimiters(updateGlyphs);
 
@@ -61,6 +61,22 @@ void GlyphAtlas::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
         texture.Update(updateGlyphs);
 
         textureIndex++;
+    }
+}
+
+void GlyphAtlas::UpdateDelimiters(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
+{
+//    default values
+//    shelfDelimiters = {16, 32, 64};
+//    slotDelimiters = {16, 32, 48, 64, 96};
+
+    if (shelfDelimiters.empty() || slotDelimiters.empty())
+    {
+        std::tie(shelfDelimiters, slotDelimiters) = CreateDelimitersByDeltas(updateGlyphs);
+    }
+    else
+    {
+        UpdateDelimitersByDeltas(updateGlyphs, shelfDelimiters, slotDelimiters);
     }
 }
 

@@ -90,6 +90,7 @@ CRect GlyphTextureStepped::RemoveStep(GlyphKey &keyToRemove)
         }
     }
     CRect rect = placedGlyphs[keyToRemove].rect;
+
     placedGlyphs.erase(keyToRemove);
     return rect;
 }
@@ -104,17 +105,16 @@ std::pair<std::vector<Rect>, std::vector<Rect>> GlyphTextureStepped::GetFreeShel
     std::vector<Rect> freeShelfRects (freeShelves.size());
     for (machine i = 0; i < freeShelfRects.size(); i++)
     {
-        auto height = static_cast<uint16>(freeShelves[i].y - freeShelves[i].x + 1);
-        freeShelfRects[i] = Rect {0, freeShelves[i].x, dims.x, height};
+        freeShelfRects[i] = Rect {0, freeShelves[i].x, dims.x, ToLength(freeShelves[i])};
     }
 
     std::vector<Rect> freeSlots;
     for (const Shelf & shelf : shelves)
     {
         auto shelfFreeSlots = shelf.GetFreeSlots();
-        for (auto freeSlotX : shelfFreeSlots)
+        for (auto freeSlot : shelfFreeSlots)
         {
-            freeSlots.emplace_back(freeSlotX.x, shelf.crossEndPoints.x, freeSlotX.y - freeSlotX.x + 1, shelf.minMaxSize.y);
+            freeSlots.emplace_back(freeSlot.x, shelf.crossEndPoints.x, ToLength(freeSlot), shelf.minMaxSize.y);
         }
     }
     return std::make_pair(freeShelfRects, freeSlots);

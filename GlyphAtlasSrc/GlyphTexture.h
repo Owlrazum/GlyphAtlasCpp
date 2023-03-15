@@ -37,7 +37,7 @@ protected:
     uint16_2 dims;
     uint8 id;
 
-    std::vector<unsigned char> textureBuffer;
+    std::vector<uint8> textureBuffer;
 
     std::vector<Shelf> shelves;
     std::vector<uint16_2> freeShelves; // uint2_16.x - yMin pos, uint2_16.y - yMax pos
@@ -58,4 +58,6 @@ protected:
     static void SplitFreeSpace(uint16_2 &freeShelf, uint16 splitHeight);
     void RemoveShelf(std::vector<Shelf>::iterator shelfToRemove);
     void ClaimFreeShelf(uint16_2 &freeShelf);
+
+    void ClearRectOfTextureBuffer(CRect rect);
 };

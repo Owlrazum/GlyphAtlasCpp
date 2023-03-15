@@ -4,10 +4,9 @@
 #include <iostream>
 
 // toreview: try to optimize freeType dimensions getting using Matt's advice
-void GlyphAtlasStepped::InitPass(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
+void GlyphAtlasStepped::InitPass(std::vector<std::pair<FontKey, GlyphKey>> &updateKeys)
 {
-    InitGlyphDims(updateGlyphs);
-    queue = updateGlyphs;
+    queue = InitGlyphDims(updateKeys);
     UpdateDelimiters(queue);
     stepIndex = 0;
 }

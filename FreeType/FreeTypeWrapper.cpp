@@ -17,48 +17,63 @@ FreeTypeWrapper::FreeTypeWrapper()
     }
 }
 
-// if already added, do nothing
-void FreeTypeWrapper::AddFont(FontKey fontKey)
+void FreeTypeWrapper::InitGlyphKey(const FontKey &fontKey, GlyphKey &glyphKey)
 {
-    if (auto pair = facesByFont.find(fontKey.fileId); pair != facesByFont.end())
+    if (auto search = keysToIndexInPointers.find(fontKey); search != keysToIndexInPointers.end())
     {
-        if (auto size = sizesByFontKey.find(fontKey); size != sizesByFontKey.end())
-        {
-            return;
-        }
-
-        FT_Size size;
-        errorCode = FT_New_Size(pair->second, &size);
-        if (errorCode) throw std::invalid_argument("Unknown error");
-        FT_Activate_Size(size);
-        errorCode = FT_Set_Char_Size(pair->second, 0, fontKey.size, dpi.x, dpi.y);
-        if (errorCode) throw std::invalid_argument("Unknown error");
+        glyphKey.fontIndex = search->second;
     }
-
-    FT_Face newFace;
-    errorCode = FT_New_Face(library, GetFontPath(fontKey.fileId.fontId).c_str(), fontKey.fileId.faceIndex, &newFace);
-    if (errorCode)
+    else
     {
-        if (errorCode == FT_Err_Unknown_File_Format)
-        {
-            throw std::invalid_argument("Unknown file format");
-        }
-        throw std::invalid_argument("Unknown error");
+        glyphKey.fontIndex = AddFontKey(fontKey);
     }
-
-    errorCode = FT_Set_Char_Size(newFace, 0, fontKey.size, dpi.x, dpi.y);
-    if (errorCode) throw std::invalid_argument("Unknown error");
-
-    sizesByFontKey.insert(std::make_pair(fontKey, newFace->size));
-    facesByFont.insert(std::make_pair(fontKey.fileId, newFace));
 }
 
-FT_Bitmap FreeTypeWrapper::RenderChar(const FontKey &fontKey, uint32 character)
+uint8 FreeTypeWrapper::AddFontKey(const FontKey &fontKey)
 {
+    if (auto pair = facesByFontFileId.find(fontKey.fileId); pair != facesByFontFileId.end())
+    {
+        assert(sizesByFontKey.find(fontKey) == sizesByFontKey.end());
+
+        FT_Face& face = pair->second;
+        FT_Size size;
+        errorCode = FT_New_Size(face, &size);
+        if (errorCode) throw std::invalid_argument("Unknown error");
+        FT_Activate_Size(size);
+        errorCode = FT_Set_Char_Size(face, 0, fontKey.size, dpi.x, dpi.y);
+        if (errorCode) throw std::invalid_argument("Unknown error");
+
+        sizesByFontKey.insert(std::make_pair(fontKey, size));
+        facesByFontFileId.insert(std::make_pair(fontKey.fileId, face));
+    }
+    else
+    {
+        FT_Face newFace;
+        errorCode = FT_New_Face(library, GetFontPath(fontKey.fileId.fontId).c_str(), fontKey.fileId.faceIndex, &newFace);
+        if (errorCode == FT_Err_Unknown_File_Format) throw std::invalid_argument("Unknown file format");
+        if (errorCode) throw std::invalid_argument("Unknown error");
+
+        errorCode = FT_Set_Char_Size(newFace, 0, fontKey.size, dpi.x, dpi.y);
+        if (errorCode) throw std::invalid_argument("Unknown error");
+
+        sizesByFontKey.insert(std::make_pair(fontKey, newFace->size));
+        facesByFontFileId.insert(std::make_pair(fontKey.fileId, newFace));
+    }
+
+    auto fontKeyIndex = static_cast<uint8>(pointersToKeys.size());
+    auto it = keysToIndexInPointers.insert(std::make_pair(fontKey, fontKeyIndex)).first;
+    pointersToKeys.push_back(&it->first);
+    return fontKeyIndex;
+}
+
+FT_Bitmap FreeTypeWrapper::RenderGlyph(const GlyphKey& glyphKey)
+{
+    auto& fontKey = *pointersToKeys[glyphKey.fontIndex];
     if (auto pair = sizesByFontKey.find(fontKey); pair != sizesByFontKey.end())
     {
+        FT_Activate_Size(pair->second);
         auto face = pair->second->face;
-        errorCode = FT_Load_Char(face, character, FT_LOAD_RENDER);
+        errorCode = FT_Load_Char(face, glyphKey.character, FT_LOAD_RENDER);
         if (errorCode)
         {
             throw std::out_of_range("Some error occurred: " + std::to_string(errorCode));
@@ -69,15 +84,9 @@ FT_Bitmap FreeTypeWrapper::RenderChar(const FontKey &fontKey, uint32 character)
     throw std::out_of_range("The font key was not added");
 }
 
-FT_Bitmap FreeTypeWrapper::RenderGlyph(const GlyphKey& glyphKey)
-{
-    FontKey fontKey {glyphKey.fontIndex, 0, defaultFontSize};
-    return RenderChar(fontKey, glyphKey.glyphIndex);
-}
-
 FreeTypeWrapper::~FreeTypeWrapper()
 {
-    for(auto faceByFont : facesByFont)
+    for(auto faceByFont : facesByFontFileId)
     {
         FT_Done_Face(faceByFont.second); // the sizes were added to face's size_list by FT_New_Size
     }
