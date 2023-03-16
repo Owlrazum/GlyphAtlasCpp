@@ -6,14 +6,37 @@
 
 void GlyphAtlas::Update(std::vector<std::pair<FontKey, GlyphKey>> &updateKeys)
 {
-    auto updateGlyphs = InitGlyphDims(updateKeys);
-    PlaceIfAbsent(updateGlyphs);
-    RemoveUnused();
+    UpdateUnusedCounts();
+    for (int i = 0; i < updateKeys.size(); i++)
+    {
+        freeTypeWrapper.InitGlyphKey(updateKeys[i].first, updateKeys[i].second);
+        if (currentFrameUsedGlyphs.find(updateKeys[i].second) != currentFrameUsedGlyphs.end()) // remove duplicates in input
+        {
+            updateKeys.erase(updateKeys.begin() + i);
+            i--;
+        }
+
+        currentFrameUsedGlyphs.insert(updateKeys[i].second);
+        if (placedGlyphs.find(updateKeys[i].second) != placedGlyphs.end()) // if already contained, skip
+        {
+            updateKeys.erase(updateKeys.begin() + i);
+            i--;
+        }
+    }
+
+    auto updateGlyphs = InitGlyphsDims(updateKeys);
+    PlaceWithoutTextureCreation(updateGlyphs);
+    if (updateGlyphs.size() > 0)
+    {
+        FreeSpaceForNewPlacements();
+        PlaceWithTextureCreation(updateGlyphs);
+    }
+
     Render();
 }
 
 // todo: try to improve performance by finding freetype function to compute bbox
-std::vector<std::pair<GlyphKey, Glyph>> GlyphAtlas::InitGlyphDims(std::vector<std::pair<FontKey, GlyphKey>> &updateKeys)
+std::vector<std::pair<GlyphKey, Glyph>> GlyphAtlas::InitGlyphsDims(std::vector<std::pair<FontKey, GlyphKey>> &updateKeys)
 {
     std::vector<std::pair<GlyphKey, Glyph>> updateGlyphs;
     updateGlyphs.reserve(updateKeys.size());
@@ -21,20 +44,17 @@ std::vector<std::pair<GlyphKey, Glyph>> GlyphAtlas::InitGlyphDims(std::vector<st
     {
         FontKey& fontKey = pair.first;
         GlyphKey& glyphKey = pair.second;
-        freeTypeWrapper.InitGlyphKey(fontKey, glyphKey);
         Glyph glyph;
         if (auto search = bitmaps.find(glyphKey); search != bitmaps.end())
         {
-            glyph.rect.w = search->second.dims.x;
-            glyph.rect.h = search->second.dims.y;
+            InitGlyphDims(glyph, search->second.dims);
         }
         else
         {
             auto ftBitmap = freeTypeWrapper.RenderGlyph(glyphKey); // updates GlyphKey.fontId to be in its primary meaning
             GlyphBitmap bitmap (ftBitmap);
             bitmaps.insert(std::make_pair(glyphKey, bitmap));
-            glyph.rect.w = bitmap.dims.x;
-            glyph.rect.h = bitmap.dims.y;
+            InitGlyphDims(glyph, bitmap.dims);
         }
 
         updateGlyphs.emplace_back(glyphKey, glyph);
@@ -43,8 +63,22 @@ std::vector<std::pair<GlyphKey, Glyph>> GlyphAtlas::InitGlyphDims(std::vector<st
     return updateGlyphs;
 }
 
+void GlyphAtlas::InitGlyphDims(Glyph &glyph, uint16_2 dims) const
+{
+    if (hasSinglePixelPadding)
+    {
+        glyph.rect.w = dims.x + 2;
+        glyph.rect.h = dims.y + 2;
+    }
+    else
+    {
+        glyph.rect.w = dims.x;
+        glyph.rect.h = dims.y;
+    }
+}
 
-void GlyphAtlas::PlaceIfAbsent(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
+
+void GlyphAtlas::PlaceWithoutTextureCreation(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
 {
     UpdateDelimiters(updateGlyphs);
 
@@ -53,12 +87,27 @@ void GlyphAtlas::PlaceIfAbsent(std::vector<std::pair<GlyphKey, Glyph>> &updateGl
     {
         if (textureIndex == textures.size())
         {
-            textures.emplace_back(
-                    shelfDelimiters, slotDelimiters,
-                    textureMaxDims, textures.size());
+            return;
         }
         auto& texture = textures[textureIndex];
-        texture.Update(updateGlyphs);
+        texture.Update(updateGlyphs, placedGlyphs);
+
+        textureIndex++;
+    }
+}
+
+void GlyphAtlas::PlaceWithTextureCreation(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
+{
+    machine textureIndex = 0;
+    while (!updateGlyphs.empty())
+    {
+        if (textureIndex == textures.size())
+        {
+            textures.emplace_back( shelfDelimiters, slotDelimiters,
+                    textureMaxDims, unusedThresholds, textures.size());
+        }
+        auto& texture = textures[textureIndex];
+        texture.Update(updateGlyphs, placedGlyphs);
 
         textureIndex++;
     }
@@ -80,22 +129,66 @@ void GlyphAtlas::UpdateDelimiters(std::vector<std::pair<GlyphKey, Glyph>> &updat
     }
 }
 
-void GlyphAtlas::RemoveUnused()
-{
-    for (machine i = 0; i < textures.size(); i++)
-    {
-        textures[i].RemoveUnused();
-        if (textures[i].IsEmpty())
-        {
-            textures.erase(textures.begin() + i);
-        }
-    }
-}
-
 void GlyphAtlas::Render()
 {
     for (auto& texture : textures)
     {
-        texture.Render(bitmaps);
+        texture.Render(bitmaps, placedGlyphs, hasSinglePixelPadding);
     }
+}
+
+void GlyphAtlas::UpdateUnusedCounts()
+{
+    std::vector<std::pair<GlyphKey, uint16>> unusedKeys;
+
+    std::set_difference(glyphsUnusedFramesCount.begin(), glyphsUnusedFramesCount.end(),
+                        currentFrameUsedGlyphs.begin(), currentFrameUsedGlyphs.end(),
+                        std::inserter(unusedKeys, unusedKeys.begin()), KeyLess());
+
+    currentFrameUsedGlyphs.clear();
+
+    for (auto& unusedKeyPair : unusedKeys)
+    {
+        auto& unusedFrameCount = glyphsUnusedFramesCount[unusedKeyPair.first];
+        unusedFrameCount++;
+        if (unusedFrameCount >= unusedThresholds.y)
+        {
+            auto textureId = placedGlyphs[unusedKeyPair.first].textureId;
+            textures[textureId].RemoveGlyph(unusedKeyPair.first, placedGlyphs, hasSinglePixelPadding);
+            glyphsUnusedFramesCount.erase(unusedKeyPair.first);
+        }
+    }
+}
+
+void GlyphAtlas::FreeSpaceForNewPlacements()
+{
+    auto iter = glyphsUnusedFramesCount.begin();
+    auto end = glyphsUnusedFramesCount.end();
+    while (iter != end)
+    {
+        if (iter->second >= unusedThresholds.x)
+        {
+            auto textureId = placedGlyphs[iter->first].textureId;
+            textures[textureId].RemoveGlyph(iter->first, placedGlyphs, hasSinglePixelPadding);
+        }
+        else
+        {
+            iter++;
+        }
+    }
+}
+
+Glyph GlyphAtlas::GetPlacedGlyph(GlyphKey key)
+{
+    if (hasSinglePixelPadding)
+    {
+        Glyph glyph = placedGlyphs[key];
+        glyph.rect.x++;
+        glyph.rect.y++;
+        glyph.rect.w -= 2;
+        glyph.rect.h -= 2;
+        return glyph;
+    }
+
+    return placedGlyphs[key];
 }

@@ -5,12 +5,24 @@
 #include <iterator>
 #include <iostream>
 
-void GlyphTexture::Render(std::map<GlyphKey, GlyphBitmap> &renderedBitmaps)
+void GlyphTexture::Render(std::map<GlyphKey, GlyphBitmap> &renderedBitmaps, std::map<GlyphKey, Glyph> &placedGlyphs,
+                          bool hasSinglePixelPadding)
 {
     for (const auto& glyph : placedGlyphs)
     {
+        if (glyph.second.textureId != id)
+        {
+            continue;
+        }
+
         auto& bitmap = renderedBitmaps.find(glyph.first)->second;//freeType.RenderGlyph(glyph.first);
         uint16_2 pos = {glyph.second.rect.x, glyph.second.rect.y};
+        if (hasSinglePixelPadding)
+        {
+            pos.x++;
+            pos.y++;
+        }
+
         machine bitmapRowFlippedStart = bitmap.dims.y - 1;
         machine textureRowFlippedStart = dims.y - pos.y - 1;
         for (machine i = 0; i < bitmap.dims.y; i++)
@@ -24,60 +36,65 @@ void GlyphTexture::Render(std::map<GlyphKey, GlyphBitmap> &renderedBitmaps)
     }
 }
 
-void GlyphTexture::ClearRectOfTextureBuffer(CRect rect)
+void GlyphTexture::ClearRectOfTextureBuffer(CRect rect, bool hasSinglePixelPadding)
 {
     auto posY = dims.y - rect.y - 1;
-    auto dest = textureBuffer.data() + posY * dims.x + rect.x;
-    for (int i = 0; i < rect.h; i++)
+    auto posX = rect.x;
+    auto width = rect.w;
+    auto height = rect.h;
+    if (hasSinglePixelPadding)
     {
-        memset(dest, 0, rect.w);
+        posX++;
+        posY++;
+        width -= 2;
+        height -= 2;
+    }
+
+    auto dest = textureBuffer.data() + posY * dims.x + posX;
+    for (int i = 0; i < height; i++)
+    {
+        memset(dest, 0, width);
         dest -= dims.x;
     }
 }
 
-bool GlyphTexture::ContainsGlyph(const GlyphKey &key) const
+uint16 GlyphTexture::GetSlotWidth(const Glyph &glyph) const
 {
-    return placedGlyphs.find(key) != placedGlyphs.end();
+    uint16 slotWidth = 0;
+    for (uint16 widthDelimiter : widthDelimiters.get())
+    {
+        if (glyph.rect.w <= widthDelimiter)
+        {
+            slotWidth = widthDelimiter;
+            break;
+        }
+    }
+    if (slotWidth == 0)
+    {
+        throw std::out_of_range("The shelfRect width too large to fit into just created shelf");
+    }
+    return slotWidth;
 }
 
 /// Erases glyphs that are placed from glyphs argument;
-void GlyphTexture::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
+void GlyphTexture::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs,
+                          std::map<GlyphKey, Glyph> &placedGlyphs)
 {
     for(machine i = 0; i < updateGlyphs.size(); i++)
     {
-        auto updateGlyph = updateGlyphs[i];
-        GlyphKey &glyphKey = updateGlyph.first;
-        Glyph &glyph = updateGlyph.second;
+        auto& updateGlyph = updateGlyphs[i];
+        GlyphKey &glyphKey = updateGlyphs[i].first;
+        Glyph &glyph = updateGlyphs[i].second;
 
-        uint16 slotWidth = 0;
-        for (uint16 widthDelimiter : widthDelimiters.get())
-        {
-            if (glyph.rect.w <= widthDelimiter)
-            {
-                slotWidth = widthDelimiter;
-                break;
-            }
-        }
-        if (slotWidth == 0)
-        {
-            throw std::out_of_range("The shelfRect width too large to fit into just created shelf");
-        }
-
-        if (ContainsGlyph(glyphKey))
-        {
-            glyph.textureId = id;
-            updateGlyphs.erase(updateGlyphs.begin() + i); // not using erase remove idiom to preserve the sort order
-            currentlyPlacedGlyphs.insert(glyphKey);
-            i--;
-            continue;
-        }
+        uint16 slotWidth = GetSlotWidth(glyph);
 
         bool found = FitInExistingSpot(updateGlyph, slotWidth);
         if (found)
         {
+            glyph.textureId = id;
             placedGlyphs.insert(updateGlyph);
             updateGlyphs.erase(updateGlyphs.begin() + i); // not using erase remove idiom to preserve the sort order
-            currentlyPlacedGlyphs.insert(glyphKey);
+            placedGlyphsCount++;
             i--;
             continue;
         }
@@ -85,9 +102,10 @@ void GlyphTexture::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs)
         bool wasPlaced = CreateShelf(updateGlyph, slotWidth);
         if (wasPlaced)
         {
+            glyph.textureId = id;
             placedGlyphs.insert(updateGlyph);
             updateGlyphs.erase(updateGlyphs.begin() + i); // not using erase remove idiom to preserve the sort order
-            currentlyPlacedGlyphs.insert(glyphKey);
+            placedGlyphsCount++;
             i--;
             continue;
         }
@@ -180,41 +198,23 @@ void GlyphTexture::SplitFreeSpace(uint16_2 &freeShelf, uint16 splitHeight)
     freeShelf.x = occupiedY;
 }
 
-void GlyphTexture::RemoveUnused()
+void GlyphTexture::RemoveGlyph(const GlyphKey &glyphKey, std::map<GlyphKey, Glyph> &placedGlyphs, bool hasSinglePixelPadding)
 {
-    if (previouslyPlacedGlyphs.empty())
+    for (machine i = 0; i < shelves.size(); i++)
     {
-        previouslyPlacedGlyphs = currentlyPlacedGlyphs;
-        currentlyPlacedGlyphs.clear();
-        return;
-    }
-
-    std::vector<GlyphKey> unusedKeys;
-
-    std::set_difference(previouslyPlacedGlyphs.begin(), previouslyPlacedGlyphs.end(),
-                        currentlyPlacedGlyphs.begin(), currentlyPlacedGlyphs.end(),
-                        std::inserter(unusedKeys, unusedKeys.begin()));
-
-    previouslyPlacedGlyphs = currentlyPlacedGlyphs;
-    currentlyPlacedGlyphs.clear();
-
-    for (const auto& key : unusedKeys)
-    {
-        for (machine i = 0; i < shelves.size(); i++)
+        auto keyRemovedShelfEmpty = shelves[i].TryRemove(glyphKey);
+        if (keyRemovedShelfEmpty.first)
         {
-            auto keyRemovedShelfEmpty = shelves[i].TryRemove(key);
-            if (keyRemovedShelfEmpty.first)
+            if (keyRemovedShelfEmpty.second)
             {
-                if (keyRemovedShelfEmpty.second)
-                {
-                    RemoveShelf(shelves.begin() + i);
-                }
-                break;
+                RemoveShelf(shelves.begin() + i);
             }
+            break;
         }
-        ClearRectOfTextureBuffer(placedGlyphs.find(key)->second.rect);
-        placedGlyphs.erase(key);
     }
+    ClearRectOfTextureBuffer(placedGlyphs.find(glyphKey)->second.rect, hasSinglePixelPadding);
+    placedGlyphs.erase(glyphKey);
+    placedGlyphsCount--;
 }
 
 void GlyphTexture::RemoveShelf(std::vector<Shelf>::iterator shelfToRemove)

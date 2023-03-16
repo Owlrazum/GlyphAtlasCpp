@@ -6,30 +6,77 @@
 // toreview: try to optimize freeType dimensions getting using Matt's advice
 void GlyphAtlasStepped::InitPass(std::vector<std::pair<FontKey, GlyphKey>> &updateKeys)
 {
-    queue = InitGlyphDims(updateKeys);
+    UpdateUnusedCounts();
+    for (int i = 0; i < updateKeys.size(); i++)
+    {
+        if (placedGlyphs.find(updateKeys[i].second) != placedGlyphs.end())
+        {
+            updateKeys.erase(updateKeys.begin() + i);
+            currentFrameUsedGlyphs.insert(updateKeys[i].second);
+            i--;
+        }
+    }
+
+    queue = InitGlyphsDims(updateKeys);
+
     UpdateDelimiters(queue);
-    stepIndex = 0;
+    if (steppedTextures.empty())
+    {
+        steppedTextures.emplace_back(
+                shelfDelimiters, slotDelimiters,
+                textureMaxDims, unusedThresholds, steppedTextures.size());
+    }
 }
 
-void GlyphAtlasStepped::UpdateStep()
+bool GlyphAtlasStepped::UpdateStep()
 {
-    auto toStep = queue[stepIndex];
-    machine textureIndex = 0;
-    bool wasPlaced;
+    if (queue.empty())
+    {
+        throw std::out_of_range("redundant update step");
+    }
+
+    auto& toStep = queue[stepIndex];
+    machine textureIndex = -1;
     do
     {
-        if (textureIndex == steppedTextures.size())
+        OnStepTextureIndex(toStep, textureIndex);
+        bool wasPlaced = steppedTextures[textureIndex].UpdateStep(toStep);
+        if (wasPlaced)
+        {
+            if (queue.empty())
+            {
+                return false;
+            }
+            return true;
+        }
+    }
+    while(textureIndex < 1000);
+}
+
+void GlyphAtlasStepped::OnStepTextureIndex(std::pair<GlyphKey, Glyph> &toStep, machine &textureIndex)
+{
+    textureIndex++;
+    if (textureIndex == steppedTextures.size())
+    {
+        if (shouldCreateTextures)
         {
             steppedTextures.emplace_back(
                     shelfDelimiters, slotDelimiters,
-                    textureMaxDims, steppedTextures.size());
+                    textureMaxDims, unusedThresholds, steppedTextures.size());
         }
-        wasPlaced = steppedTextures[textureIndex].UpdateStep(toStep);
-        textureIndex++;
+        else
+        {
+            stepIndex++;
+            if (stepIndex == queue.size())
+            {
+                stepIndex = 0;
+                shouldCreateTextures = true;
+                FreeSpaceForNewPlacements();
+            }
+            toStep = queue[stepIndex];
+            textureIndex = 0;
+        }
     }
-    while(!wasPlaced);
-
-    stepIndex++;
 }
 
 uint32 GlyphAtlasStepped::InitRemovePlacesPass()
@@ -92,4 +139,22 @@ CRect GlyphAtlasStepped::GetModifiedFreeStep()
     }
 
     throw std::out_of_range("Remove step did not find what to remove");
+}
+
+void GlyphAtlasStepped::FreeSpaceForNewPlacementsStepped()
+{
+    auto iter = glyphsUnusedFramesCount.begin();
+    auto end = glyphsUnusedFramesCount.end();
+    while (iter != end)
+    {
+        if (iter->second >= unusedThresholds.x)
+        {
+            auto textureId = placedGlyphs[iter->first].textureId;
+            steppedTextures[textureId].RemoveGlyph(iter->first, placedGlyphs, hasSinglePixelPadding);
+        }
+        else
+        {
+            iter++;
+        }
+    }
 }

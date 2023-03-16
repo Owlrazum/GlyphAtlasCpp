@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <random>
+#include <array>
 
 #include "simdutf.h"
 
@@ -32,7 +33,7 @@ void WriteGlyphTestData(
     std::random_device rd; // obtain a random number from hardware
     std::default_random_engine gen(rd()); // seed the generator
     auto fontIdGen = std::bind(std::uniform_int_distribution<> (0, static_cast<int>(fontCount) - 1), gen);
-    auto fontSizeGen = std::bind(std::uniform_int_distribution<> (4, 40), gen);
+    auto fontSizeGen = std::bind(std::uniform_int_distribution<> (4, 20), gen);
     auto glyphGen = std::bind(std::uniform_int_distribution<> ('a', 'z'), gen);
     auto boolGen = std::bind(std::uniform_int_distribution<> (0, 1), gen);
 
@@ -64,9 +65,10 @@ std::vector<std::vector<std::pair<FontKey, GlyphKey>>> ReadGlyphTestData(const s
     int32 fontSize;
     char32_t glyphCharacter;
     char buffer[4];
+    memset(buffer, '\0', 4);
     while (std::getline(in, line))
     {
-        std::istringstream ss{line};
+        std::istringstream ss (line);
         std::vector<std::pair<FontKey, GlyphKey>> lineKeys;
         while(ss >> fontIndex >> fontSize >> buffer)
         {

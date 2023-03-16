@@ -8,8 +8,9 @@ public:
     GlyphTextureStepped(std::vector<uint16> &shelfDelimitersArg,
                  std::vector<uint16> &widthDelimitersArg,
                  uint16_2 &textureDims,
+                 uint16_2 &unusedThresholds,
                  uint8 idArg)
-            : GlyphTexture(shelfDelimitersArg, widthDelimitersArg, textureDims, idArg)
+            : GlyphTexture(shelfDelimitersArg, widthDelimitersArg, textureDims, unusedThresholds, idArg)
     {
     }
 

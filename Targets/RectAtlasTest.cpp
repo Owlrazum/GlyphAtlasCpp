@@ -34,7 +34,7 @@ DLLEXPORT CRect RemovePlacedStep();
 }
 
 uint16_2 maxTextureDims = {512, 512};
-GlyphAtlasStepped glyphAtlasStepped = GlyphAtlasStepped(maxTextureDims);
+GlyphAtlasStepped glyphAtlasStepped = GlyphAtlasStepped(maxTextureDims, {1, 200});
 
 // the containers are flushed after each step.
 std::vector<std::vector<std::pair<FontKey, GlyphKey>>> passKeysByTestNumber{};

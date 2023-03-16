@@ -14,11 +14,14 @@
 class GlyphAtlas
 {
 public:
-    explicit GlyphAtlas(uint16_2 textureMaxDimsArg)
-            : textureMaxDims(textureMaxDimsArg)
+    explicit GlyphAtlas(uint16_2 textureMaxDimsArg, uint16_2 unusedThresholdsArg, bool hasSinglePixelPaddingArg = true)
+            : textureMaxDims(textureMaxDimsArg),
+              unusedThresholds(unusedThresholdsArg),
+              hasSinglePixelPadding(hasSinglePixelPaddingArg)
     {
         textures = std::vector<GlyphTexture>();
         bitmaps = std::map<GlyphKey, GlyphBitmap>();
+        placedGlyphs = std::map<GlyphKey, Glyph>();
     };
 
     virtual ~GlyphAtlas() // it is not RAII way, but turned out simpler for me, than to properly define GlyphBitmap class.
@@ -30,22 +33,34 @@ public:
     }
 
     void Update(std::vector<std::pair<FontKey, GlyphKey>> &updateKeys);
+    Glyph GetPlacedGlyph(GlyphKey glyphKey); // the public API for Evolve
 
     uint32 GetTexturesCount() { return textures.size(); }
     uint8* GetTextureBuffer(machine textureId){ return textures[textureId].GetRawBuffer(); }
 
 protected:
-    std::vector<std::pair<GlyphKey, Glyph>> InitGlyphDims(std::vector<std::pair<FontKey, GlyphKey>> &updateKeys);
-    void PlaceIfAbsent(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
-    void RemoveUnused();
+    void InitGlyphDims(Glyph &glyph, uint16_2 dims) const;
+    std::vector<std::pair<GlyphKey, Glyph>> InitGlyphsDims(std::vector<std::pair<FontKey, GlyphKey>> &updateKeys);
+    void PlaceWithoutTextureCreation(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
+    void PlaceWithTextureCreation(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs);
+    void FreeSpaceForNewPlacements();
     void Render();
+    void UpdateUnusedCounts();
 
     uint16_2 textureMaxDims;
+    bool hasSinglePixelPadding;
+
     FreeTypeWrapper freeTypeWrapper;
 
     std::vector<GlyphTexture> textures; // perhaps one glyphTexture can be referenced by multiple fonts
 
-    std::map<GlyphKey, GlyphBitmap> bitmaps; // only primary meaning of GlyphKey.fontId should be used here.
+    std::map<GlyphKey, Glyph> placedGlyphs;
+    std::map<GlyphKey, GlyphBitmap> bitmaps;
+
+    std::set<GlyphKey> currentFrameUsedGlyphs;
+    std::map<GlyphKey, uint16> glyphsUnusedFramesCount;
+
+    uint16_2 unusedThresholds = {1, 200};
 
     std::vector<uint16> shelfDelimiters;
     std::vector<uint16> slotDelimiters;

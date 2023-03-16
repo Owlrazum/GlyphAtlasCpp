@@ -4,35 +4,31 @@
 #include "GlyphTextureStepped.h"
 #include <queue>
 
+struct UpdateStatus
+{
+    bool hasMoreUpdates;
+    uint8 textureId;
+    Rect placedGlyphRect;
+    std::vector<Rect> oldFreeSlots;
+    std::vector<Rect> oldFreeShelf;
+    std::vector<Rect> newFreeSlots;
+    std::vector<Rect> newFreeShelves;
+};
+
+// it is broken due to API change. Will revive it only in case of thorough debug needed.
+
 class GlyphAtlasStepped : public GlyphAtlas
 {
 public:
-    explicit GlyphAtlasStepped(uint16_2 textureMaxDimsArg)
-            : GlyphAtlas(textureMaxDimsArg)
+    explicit GlyphAtlasStepped(uint16_2 textureMaxDimsArg, uint16_2 unusedThresholdsArg, bool hasSinglePixelPadding = true)
+            : GlyphAtlas(textureMaxDimsArg, unusedThresholdsArg, hasSinglePixelPadding)
     {
         stepIndex = 0;
     };
 
     void InitPass(std::vector<std::pair<FontKey, GlyphKey>> &updateKeys);
-
-    void UpdateStep(); // returns number of used textures
-
-    uint32 InitRemovePlacesPass();
-    CRect RemovePlacedStep();
-
-    uint32 InitGetModifiedFreePass();
-    CRect GetModifiedFreeStep();
-
-    [[nodiscard]] std::pair<std::vector<Rect>, std::vector<Rect>>
-    GetFreeShelfSlotSpace(machine textureId) const // the first vector is freeSpace for the shelves
-    {
-        return steppedTextures[textureId].GetFreeShelfSlotSpace();
-    }
-
-    std::map<GlyphKey, Glyph> GetGlyphsFromTexture(uint8 textureId)
-    {
-        return steppedTextures[textureId].GetGlyphs();
-    }
+    // returns whether more steps are left
+    UpdateStatus UpdateStep();
 
     uint32 GetSteppedTexturesCount()
     {
@@ -40,10 +36,15 @@ public:
     }
 
 private:
+    bool shouldCreateTextures;
     machine stepIndex;
+
     std::vector<GlyphTextureStepped> steppedTextures;
     std::vector<std::pair<GlyphKey, Glyph>> queue;
 
     std::vector<std::vector<GlyphKey>> removePlacedQueue;
     std::vector<Rect> removeFreeQueue;
+
+    void OnStepTextureIndex(std::pair<GlyphKey, Glyph> &toStep, machine &textureIndex);
+    void FreeSpaceForNewPlacementsStepped();
 };

@@ -29,7 +29,7 @@ private:
     uint8 AddFontKey(const FontKey &fontKey);
 
     FT_Library library;
-    uint16_2 dpi {220, 220};
+    uint16_2 dpi {512, 512};
 
     // I needed an indexed set, using method described here:
     // https://stackoverflow.com/questions/2561992/c-need-indexed-set

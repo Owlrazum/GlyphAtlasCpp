@@ -8,7 +8,7 @@
 namespace GlyphAtlasTest
 {
     uint16_2 maxTextureDims = {512, 512};
-    GlyphAtlas glyphAtlas = GlyphAtlas(maxTextureDims);
+    GlyphAtlas glyphAtlas = GlyphAtlas(maxTextureDims, {1, 200}, true);
 
     struct AtlasTextures
     {
