@@ -10,6 +10,7 @@ struct int32_2
     int32 y;
 };
 
+// deprecated
 extern "C"
 {
 DLLEXPORT int32 InitTest(int32 testNumber);

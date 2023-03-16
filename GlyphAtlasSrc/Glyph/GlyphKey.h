@@ -6,19 +6,17 @@
 #include <string>
 #include <sstream>
 
-// One shelf one fontIndex ?
-// The cost of restructuring
-// for each font for each size max height for the shelf
-// delimiters may be calculated based on each font
-
-// 1) Remove already contained from the input queue
-// 2) Figure if existing textures can contain all the input queue
-//    a) One font - one texture if no room, if there is space, multiple fonts inside texture. Mode of mixed or not
+// toreview:
+// 1. One font - one texture if no room, if there is space, multiple fonts inside texture. Mode of mixed or not
+// 2. One shelf one fontIndex ?
+// 3. for each font for each size max height for the shelf - forgot what it means
+// 4. The cost of restructuring
+// 5. delimiters may be calculated based on each font
 
 struct GlyphKey
 {
-    uint8 fontIndex;
-    uint32 character; // not sure whether char32_t is the correct type, but uint32 is causing errors.
+    uint8 fontIndex; // the FreeTypeWrapper initializes this field as an index to internal FontKeys data structure.
+    uint32 character;
 
     [[nodiscard]] std::string ToString() const
     {

@@ -17,6 +17,7 @@ struct GlyphData
 
 FreeTypeWrapper freeType;
 
+// deprecated
 extern "C"
 {
     DLLEXPORT void RenderCharTest(GlyphData *data, int8 character)

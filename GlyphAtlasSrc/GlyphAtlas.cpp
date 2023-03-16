@@ -51,7 +51,7 @@ std::vector<std::pair<GlyphKey, Glyph>> GlyphAtlas::InitGlyphsDims(std::vector<s
         }
         else
         {
-            auto ftBitmap = freeTypeWrapper.RenderGlyph(glyphKey); // updates GlyphKey.fontId to be in its primary meaning
+            auto ftBitmap = freeTypeWrapper.RenderGlyph(glyphKey); // update GlyphKey.fontId to be in its primary meaning
             GlyphBitmap bitmap (ftBitmap);
             bitmaps.insert(std::make_pair(glyphKey, bitmap));
             InitGlyphDims(glyph, bitmap.dims);

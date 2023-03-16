@@ -42,8 +42,6 @@ protected:
     uint16_2 dims;
     uint8 id;
 
-    uint16_2 unusedThresholds;
-
     uint16 placedGlyphsCount;
 
     std::vector<uint8> textureBuffer;

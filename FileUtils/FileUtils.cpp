@@ -33,7 +33,7 @@ void WriteGlyphTestData(
     std::random_device rd; // obtain a random number from hardware
     std::default_random_engine gen(rd()); // seed the generator
     auto fontIdGen = std::bind(std::uniform_int_distribution<> (0, static_cast<int>(fontCount) - 1), gen);
-    auto fontSizeGen = std::bind(std::uniform_int_distribution<> (4, 20), gen);
+    auto fontSizeGen = std::bind(std::uniform_int_distribution<> (4, 64), gen);
     auto glyphGen = std::bind(std::uniform_int_distribution<> ('a', 'z'), gen);
     auto boolGen = std::bind(std::uniform_int_distribution<> (0, 1), gen);
 

@@ -2,7 +2,7 @@
 
 #include "Algorithms.h"
 
-/// Adds into a least possible slot
+/// Adds into a first possible slot
 bool Shelf::TryAdd(std::pair<GlyphKey, Glyph> &glyph, uint16 slotWidth)
 {
     Rect& rect = glyph.second.rect;
@@ -29,7 +29,7 @@ bool Shelf::TryAdd(std::pair<GlyphKey, Glyph> &glyph, uint16 slotWidth)
         }
     }
 
-    return false; // The shelfRect width too large to fit into freeSlots of a shelf
+    return false; // The slotWidth too large to fit into freeSlots of a shelf
 }
 
 std::pair<bool, bool> Shelf::TryRemove(const GlyphKey &key)
@@ -70,6 +70,13 @@ void Shelf::SplitSlot(uint16_2 &freeSlot, uint16 slotWidth, const GlyphKey &key)
     assert(usedSlot.x != freeSlot.x);
 }
 
+// Should be used only as a debug version.
+const std::vector<uint16_2> &Shelf::GetFreeSlots() const
+{
+    return freeSlots;
+}
+
+// used for debug
 void Shelf::CheckIntegrity()
 {
     std::vector<uint16_2> slots;
@@ -84,10 +91,4 @@ void Shelf::CheckIntegrity()
     }
 
     CheckContainerIntegrity(slots, mainEndPoints.y + 1);
-}
-
-// Should be used only as a debug version.
-const std::vector<uint16_2> &Shelf::GetFreeSlots() const
-{
-    return freeSlots;
 }

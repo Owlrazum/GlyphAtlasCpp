@@ -33,7 +33,7 @@ public:
     }
 
     void Update(std::vector<std::pair<FontKey, GlyphKey>> &updateKeys);
-    Glyph GetPlacedGlyph(GlyphKey glyphKey); // the public API for Evolve
+    Glyph GetPlacedGlyph(GlyphKey glyphKey); // do not remove: the public API for Evolve
 
     uint32 GetTexturesCount() { return textures.size(); }
     uint8* GetTextureBuffer(machine textureId){ return textures[textureId].GetRawBuffer(); }
@@ -52,7 +52,7 @@ protected:
 
     FreeTypeWrapper freeTypeWrapper;
 
-    std::vector<GlyphTexture> textures; // perhaps one glyphTexture can be referenced by multiple fonts
+    std::vector<GlyphTexture> textures;
 
     std::map<GlyphKey, Glyph> placedGlyphs;
     std::map<GlyphKey, GlyphBitmap> bitmaps;

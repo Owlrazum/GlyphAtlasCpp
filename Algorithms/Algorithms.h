@@ -43,6 +43,6 @@ void UpdateDelimitersByDeltas(
 uint16 ToLength(const uint16_2& endPoints);
 uint16_2 ToEndPoints(uint16 start, uint16 length);
 
-// Traverses pair to merge into, can reduce the size of the container by one in the insertion to the middle case.
+// Traverses pair to merge into, can reduce the size of the container by one in the case of insertion to the middle case.
 bool MergeIntoIfPossible(uint16_2 &toMerge, std::vector<uint16_2>& intoContainer);
 void CheckContainerIntegrity(std::vector<uint16_2>& container, uint16 growTarget);

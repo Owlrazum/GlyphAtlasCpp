@@ -2,6 +2,7 @@
 
 #include "GlyphTexture.h"
 
+// deprecated
 class GlyphTextureStepped : public GlyphTexture
 {
 public:

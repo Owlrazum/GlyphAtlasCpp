@@ -15,7 +15,7 @@ void GlyphTexture::Render(std::map<GlyphKey, GlyphBitmap> &renderedBitmaps, std:
             continue;
         }
 
-        auto& bitmap = renderedBitmaps.find(glyph.first)->second;//freeType.RenderGlyph(glyph.first);
+        auto& bitmap = renderedBitmaps.find(glyph.first)->second;
         uint16_2 pos = {glyph.second.rect.x, glyph.second.rect.y};
         if (hasSinglePixelPadding)
         {
@@ -76,14 +76,12 @@ uint16 GlyphTexture::GetSlotWidth(const Glyph &glyph) const
     return slotWidth;
 }
 
-/// Erases glyphs that are placed from glyphs argument;
 void GlyphTexture::Update(std::vector<std::pair<GlyphKey, Glyph>> &updateGlyphs,
                           std::map<GlyphKey, Glyph> &placedGlyphs)
 {
     for(machine i = 0; i < updateGlyphs.size(); i++)
     {
         auto& updateGlyph = updateGlyphs[i];
-        GlyphKey &glyphKey = updateGlyphs[i].first;
         Glyph &glyph = updateGlyphs[i].second;
 
         uint16 slotWidth = GetSlotWidth(glyph);

@@ -3,7 +3,6 @@
 #include "CppExport.h"
 
 #include <vector>
-#include <iostream>
 
 namespace GlyphAtlasTest
 {
@@ -18,7 +17,6 @@ namespace GlyphAtlasTest
 
     extern "C"
     {
-    // returns number of glyphs
     DLLEXPORT void RenderAtlasTextures(AtlasTextures* atlasTextures, machine testNumber)
     {
         auto testCase = ReadGlyphTestData(GetTestGlyphKeysPath(testNumber));

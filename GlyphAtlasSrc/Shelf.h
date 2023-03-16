@@ -26,13 +26,13 @@ public:
 
     bool TryAdd(std::pair<GlyphKey, Glyph> &glyph, uint16 slotWidth);
     [[nodiscard]] const std::vector<uint16_2>& GetFreeSlots() const;
-    std::pair<bool, bool> TryRemove(const GlyphKey &key); // returns first whether key was removed, second whether the shelf is empty
+    std::pair<bool, bool> TryRemove(const GlyphKey &key); // returns pair.first as whether key was removed, pair.second as whether the shelf is empty
 
-    void CheckIntegrity();
+    void CheckIntegrity(); // for debug
 private:
     std::map<GlyphKey, uint16_2> usedSlots;
     std::vector<uint16_2> freeSlots; // pair here is two positions inclusive, start and end on x-axis.
 
     void SplitSlot(uint16_2 &freeSlot, uint16 slotWidth, const GlyphKey &key);
-    void ClaimFreeSlot(uint16_2 &newFreeSlot); // returns whether slot was merged
+    void ClaimFreeSlot(uint16_2 &newFreeSlot);
 };

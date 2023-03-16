@@ -6,6 +6,7 @@
 
 #include <string>
 
+// deprecated
 class SvgWriter
 {
 public:

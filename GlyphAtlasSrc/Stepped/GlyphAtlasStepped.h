@@ -17,6 +17,7 @@ struct UpdateStatus
 
 // it is broken due to API change. Will revive it only in case of thorough debug needed.
 
+// deprecated
 class GlyphAtlasStepped : public GlyphAtlas
 {
 public:

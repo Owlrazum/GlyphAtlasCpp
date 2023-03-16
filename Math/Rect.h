@@ -2,6 +2,7 @@
 
 #include "PrimitiveTypes.h"
 
+// using CRect because of C++/C# communication
 extern "C" typedef struct CRect
 {
     bool operator<(const CRect &rhs) const;

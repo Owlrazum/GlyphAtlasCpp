@@ -9,7 +9,7 @@
 std::string GetFontPath(machine fontId);
 std::string GetTestGlyphKeysPath(machine testNumber);
 
-// writes rndFontIndex and rnd latin character
+// writes rndFontIndex, rndFontSize, and rnd latin character
 void WriteGlyphTestData(
         std::ofstream &out,
         machine fontCount,
