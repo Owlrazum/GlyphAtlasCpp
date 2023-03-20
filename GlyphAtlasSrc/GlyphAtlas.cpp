@@ -24,6 +24,11 @@ void GlyphAtlas::Update(std::vector<std::pair<FontKey, GlyphKey>> &updateKeys)
         }
     }
 
+    if (updateKeys.empty())
+    {
+        return;
+    }
+
     auto updateGlyphs = InitGlyphsDims(updateKeys);
     PlaceWithoutTextureCreation(updateGlyphs);
     if (updateGlyphs.size() > 0)

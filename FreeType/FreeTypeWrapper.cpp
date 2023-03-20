@@ -4,6 +4,8 @@
 
 #include "FileUtils.h"
 
+#include "SimdUtfWrapper.h"
+
 #include <stdexcept>
 #include <string>
 
@@ -27,6 +29,8 @@ void FreeTypeWrapper::InitGlyphKey(const FontKey &fontKey, GlyphKey &glyphKey)
     {
         glyphKey.fontIndex = AddFontKey(fontKey);
     }
+
+    SimdUtfWrapper::ConvertToUtf32(glyphKey);
 }
 
 uint8 FreeTypeWrapper::AddFontKey(const FontKey &fontKey)

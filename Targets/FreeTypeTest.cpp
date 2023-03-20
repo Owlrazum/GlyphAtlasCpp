@@ -9,24 +9,28 @@
 struct GlyphData
 {
     uint8 *bitmap;
-    uint32 width;
-    uint32 rowCount;
-
-    int32 pitch;
+    int32 width;
+    int32 rowCount;
 };
 
 FreeTypeWrapper freeType;
 
-// deprecated
 extern "C"
 {
-    DLLEXPORT void RenderCharTest(GlyphData *data, int8 character)
+    DLLEXPORT void RenderCharTest(GlyphData *data, uint32 character, int32 size)
     {
-        FontKey fontKey {0, 0, 16 * 64};
-        auto bitmap = freeType.RenderChar(fontKey, character);
+        FontKey fontKey {2, 0, size * 64};
+        GlyphKey glyphKey = {0, character};
+        freeType.InitGlyphKey(fontKey, glyphKey);
+        auto bitmap = freeType.RenderGlyph(glyphKey);
         data->bitmap = bitmap.buffer;
-        data->width = bitmap.width;
-        data->rowCount = bitmap.rows;
-        data->pitch = bitmap.pitch;
+        data->width = static_cast<int32>(bitmap.width);
+        data->rowCount = static_cast<int32>(bitmap.rows);
     }
+}
+
+int main()
+{
+    GlyphData data;
+    RenderCharTest(&data, 'z', 16);
 }

@@ -1,10 +1,11 @@
 #pragma once
 
 #include "simdutf.h"
+#include "GlyphKey.h"
 
 class SimdUtfWrapper
 {
 public:
-    static bool IsValidUtf8(const std::string& text);
-    static bool IsValidUtf8(const char* text);
+    // throws on conversion and validation errorrs
+    static void ConvertToUtf32(GlyphKey &glyphKey);
 };

@@ -21,7 +21,6 @@ public:
             : shelfDelimiters(shelfDelimitersArg),
               widthDelimiters(widthDelimitersArg),
               dims(textureDims),
-              unusedThresholds(unusedThresholdsArg),
               id(idArg)
     {
         freeShelves.emplace_back(0, dims.y - 1);

@@ -23,6 +23,7 @@ target_sources(GlyphAtlasTest
 target_include_directories(GlyphAtlasTest PRIVATE . Glyph)
 
 target_include_directories(FreeTypeTest PRIVATE . Glyph)
+target_include_directories(FreeTypeTestTest PRIVATE . Glyph)
 
 target_sources(GlyphAtlasTestTest
                PRIVATE

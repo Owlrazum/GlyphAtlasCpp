@@ -16,7 +16,7 @@
 struct GlyphKey
 {
     uint8 fontIndex; // the FreeTypeWrapper initializes this field as an index to internal FontKeys data structure.
-    uint32 character;
+    uint32 character; // needs conversion from utf8 to utf32 by SimdUtfWrapper
 
     [[nodiscard]] std::string ToString() const
     {

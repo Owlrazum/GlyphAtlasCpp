@@ -10,6 +10,12 @@ target_sources(FreeTypeTest
                )
 target_include_directories(FreeTypeTest PRIVATE .)
 
+target_sources(FreeTypeTestTest
+               PRIVATE
+               Rect.cpp
+               )
+target_include_directories(FreeTypeTestTest PRIVATE .)
+
 target_sources(RectAtlasTest
                PRIVATE
                Rect.cpp
