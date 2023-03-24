@@ -8,14 +8,16 @@
 
 #include <stdexcept>
 #include <string>
+#include <cassert>
 
+#include <iostream>
 FreeTypeWrapper::FreeTypeWrapper()
 {
     library = {};
     errorCode = FT_Init_FreeType(&library);
     if (errorCode)
     {
-        throw std::invalid_argument("FreeType library was not initialized " + std::to_string(errorCode));
+        throw std::invalid_argument("FreeTypeWrapper library was not initialized " + std::to_string(errorCode));
     }
 }
 

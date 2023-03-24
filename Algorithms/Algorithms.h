@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <map>
+#include <algorithm>
 
 // https://stackoverflow.com/questions/15579623/find-set-difference-between-set-and-map-keys
 class KeyLess

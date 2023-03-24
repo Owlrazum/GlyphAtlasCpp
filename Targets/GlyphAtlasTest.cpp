@@ -45,11 +45,8 @@ namespace GlyphAtlasTest
 
 int main()
 {
-    auto testCase = ReadGlyphTestData(GetTestGlyphKeysPath(0));
-    int passNumber = 0;
-    for (auto& pass : testCase)
-    {
-        GlyphAtlasTest::glyphAtlas.Update(pass);
-        passNumber++;
-    }
+    using namespace GlyphAtlasTest;
+    AtlasTextures atlasTextures;
+    RenderAtlasTextures(&atlasTextures, 0);
+    FreeAtlasTextures(&atlasTextures);
 }

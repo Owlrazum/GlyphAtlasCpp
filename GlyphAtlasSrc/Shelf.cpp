@@ -1,5 +1,6 @@
 #include "Shelf.h"
 
+#include <cassert>
 #include "Algorithms.h"
 
 /// Adds into a first possible slot

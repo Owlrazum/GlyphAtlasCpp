@@ -3,25 +3,31 @@
 #include <fstream>
 #include <random>
 #include <array>
+#include <functional>
+#include <cstring>
 
 #include "simdutf.h"
 
+#include <iostream>
+
 std::string GetFontPath(machine fontId)
 {
+    std::string prefix {PROJECT_SOURCE_DIR};
     switch(fontId)
     {
-        case 0: return "/Users/Abai/Desktop/Evolve/GlyphAtlas/Fonts/IndividigitalThin-doM7.ttf";
-        case 1: return "/Users/Abai/Desktop/Evolve/GlyphAtlas/Fonts/Lato-Thin.ttf";
-        case 2: return "/Users/Abai/Desktop/Evolve/GlyphAtlas/Fonts/Times_New_Roman.ttf";
-        case 3: return "/Users/Abai/Desktop/Evolve/GlyphAtlas/Fonts/Lato-Black.ttf";
-        case 4: return "/Users/Abai/Desktop/Evolve/GlyphAtlas/Fonts/Lato-LightItalic.ttf";
+        case 0: return prefix + "/Fonts/IndividigitalThin-doM7.ttf";
+        case 1: return prefix + "/Fonts/Lato-Thin.ttf";
+        case 2: return prefix + "/Fonts/Times_New_Roman.ttf";
+        case 3: return prefix + "/Fonts/Lato-Black.ttf";
+        case 4: return prefix + "/Fonts/Lato-LightItalic.ttf";
         default: throw std::out_of_range("Unknown fontIndex" + std::to_string(fontId));
     }
 }
 std::string GetTestGlyphKeysPath(machine testNumber)
 {
-    std::string path = "/Users/Abai/Desktop/Evolve/GlyphAtlas/TestData/test_.txt";
-    path.insert(52, std::to_string(testNumber));
+    std::string prefix {PROJECT_SOURCE_DIR};
+    std::string path = prefix + "/TestData/test_.txt";
+    path.insert(path.length() - 4, std::to_string(testNumber));
     return path;
 }
 
@@ -72,7 +78,8 @@ std::vector<std::vector<std::pair<FontKey, GlyphKey>>> ReadGlyphTestData(const s
     uint8 fontIndex;
     int32 fontSize;
 
-    uint32 glyphCharacter;
+    // todo check whether glyphCharacter should be char32_t or uint32
+    char32_t glyphCharacter;
     char buffer[4];
     memset(buffer, '\0', 4);
     while (std::getline(in, line))
@@ -81,18 +88,18 @@ std::vector<std::vector<std::pair<FontKey, GlyphKey>>> ReadGlyphTestData(const s
         std::vector<std::pair<FontKey, GlyphKey>> lineKeys;
         while(ss >> fontIndex >> fontSize >> buffer)
         {
-//            bool result = simdutf::validate_utf8(buffer, 4);
-//            if (!result)
-//            {
-//                std::string msg = "not valid utf8 ";
-//                msg.append(buffer);
-//                throw std::out_of_range(msg);
-//            }
-//            auto conversionResult = simdutf::convert_utf8_to_utf32_with_errors(buffer, 1, &glyphCharacter);
-//            if (conversionResult.error != simdutf::SUCCESS)
-//            {
-//                throw std::out_of_range("error with conversion to utf32 from utf8");
-//            }
+            bool result = simdutf::validate_utf8(buffer, 4);
+            if (!result)
+            {
+                std::string msg = "not valid utf8 ";
+                msg.append(buffer);
+                throw std::out_of_range(msg);
+            }
+            auto conversionResult = simdutf::convert_utf8_to_utf32_with_errors(buffer, 1, &glyphCharacter);
+            if (conversionResult.error != simdutf::SUCCESS)
+            {
+                throw std::out_of_range("error with conversion to utf32 from utf8");
+            }
             fontIndex -= '0';
             uint8 defaultFaceIndex = 0;
 

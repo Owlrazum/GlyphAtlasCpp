@@ -1,5 +1,10 @@
-set(SIMDUTF_LIBRARY /Users/Abai/Desktop/Evolve/GlyphAtlas/SimdUtf/libsimdutf.a)
-set(SIMDUTF_INCLUDE /Users/Abai/Desktop/Evolve/simdutf/include)
+if (UNIX)
+    set(SIMDUTF_LIBRARY ${PROJECT_SOURCE_DIR}/SimdUtfWrapper/SimdUtf/libsimdutf.a)
+elseif(WIN32)
+    set(SIMDUTF_LIBRARY ${PROJECT_SOURCE_DIR}/SimdUtfWrapper/SimdUtf/simdutf.lib)
+endif()
+
+set(SIMDUTF_INCLUDE ${PROJECT_SOURCE_DIR}/SimdUtfWrapper/SimdUtf/include)
 
 target_link_libraries(RectAtlasTest ${SIMDUTF_LIBRARY})
 target_sources(RectAtlasTest

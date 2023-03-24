@@ -2,7 +2,6 @@
 
 #include "FileUtils.h"
 #include "Algorithms.h"
-#include <iostream>
 
 void GlyphAtlas::Update(std::vector<std::pair<FontKey, GlyphKey>> &updateKeys)
 {
@@ -31,7 +30,7 @@ void GlyphAtlas::Update(std::vector<std::pair<FontKey, GlyphKey>> &updateKeys)
 
     auto updateGlyphs = InitGlyphsDims(updateKeys);
     PlaceWithoutTextureCreation(updateGlyphs);
-    if (updateGlyphs.size() > 0)
+    if (!updateGlyphs.empty())
     {
         FreeSpaceForNewPlacements();
         PlaceWithTextureCreation(updateGlyphs);
@@ -109,7 +108,7 @@ void GlyphAtlas::PlaceWithTextureCreation(std::vector<std::pair<GlyphKey, Glyph>
         if (textureIndex == textures.size())
         {
             textures.emplace_back( shelfDelimiters, slotDelimiters,
-                    textureMaxDims, unusedThresholds, textures.size());
+                    textureMaxDims, unusedThresholds, static_cast<uint8>(textures.size()));
         }
         auto& texture = textures[textureIndex];
         texture.Update(updateGlyphs, placedGlyphs);

@@ -1,6 +1,7 @@
 #include "Algorithms.h"
 
 #include <set>
+#include <cassert>
 
 static bool CompareByHeight(const std::pair<GlyphKey, Glyph> &lhs, const std::pair<GlyphKey, Glyph> &rhs)
 {

@@ -1,9 +1,10 @@
-find_package(BZip2 REQUIRED)
-find_package(PNG REQUIRED)
+if (UNIX)
+    set(FREETYPE_LIBRARIES ${PROJECT_SOURCE_DIR}/FreeTypeWrapper/FreeType/libfreetype.a)
+elseif(WIN32)
+    set(FREETYPE_LIBRARIES ${PROJECT_SOURCE_DIR}/FreeTypeWrapper/FreeType/freetype.lib)
+endif()
 
-set(FREETYPE_LIBRARIES ${BZIP2_LIBRARIES} ${PNG_LIBRARIES} /Users/Abai/Desktop/Evolve/GlyphAtlas/FreeType/libfreetype.a)
-set(FREETYPE_INCLUDE ${BZIP2_INCLUDE_DIRS} ${PNG_INCLUDE_DIRS} /Users/Abai/Downloads/freetype-2.13.0/include)
-#/Users/Abai/Downloads/freetype-2.10.0/include
+set(FREETYPE_INCLUDE ${PROJECT_SOURCE_DIR}/FreeTypeWrapper/FreeType/include)
 
 target_link_libraries(FreeTypeTest ${FREETYPE_LIBRARIES})
 target_sources(FreeTypeTest
@@ -35,10 +36,10 @@ target_include_directories(RectAtlasTestTest PRIVATE ${FREETYPE_INCLUDE} .)
 
 target_link_libraries(GlyphAtlasTest ${FREETYPE_LIBRARIES})
 target_sources(GlyphAtlasTest
-               PRIVATE
+               PUBLIC
                FreeTypeWrapper.cpp
                )
-target_include_directories(GlyphAtlasTest PRIVATE ${FREETYPE_INCLUDE} .)
+target_include_directories(GlyphAtlasTest PUBLIC ${FREETYPE_INCLUDE} .)
 
 target_link_libraries(GlyphAtlasTestTest ${FREETYPE_LIBRARIES})
 target_sources(GlyphAtlasTestTest
