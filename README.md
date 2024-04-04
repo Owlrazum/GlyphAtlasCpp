@@ -1,6 +1,6 @@
 # Description
 
-This repo goes in pair with my repo "UnityGlyphAtlas"
+To test this repo use Unity project located in [UnityGlyphAtlas](https://github.com/Owlrazum/UnityGlyphAtlas)
 
 The project uses cmake definition PROJECT_SOURCE_DIR to determine paths.
 The included font files are referenced by the test data, no APIs for font location are in place.
