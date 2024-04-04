@@ -3,6 +3,17 @@
 The project uses cmake definition PROJECT_SOURCE_DIR to determine paths.
 The included font files are referenced by the test data, no APIs for font location are in place.
 
+I have revisited the repo after ~half-year, have managed to set it run with Unity in ~3 hours.
+
+The screenshots of rendered glyphs on atlas:
+![](glyph_atlas_simple.jpg)
+The next two are packing glyphs in red, green, blue and alpha channels of the texture
+![](glyph_atlas_black.jpg)
+![](glyph_atlas_white.jpg)
+
+## Free type
+The atlas was using freetype library to render the glyphs, and the following are notes for myself on how to build it.
+
 ### Windows
 
 The freetype library for GlyphAtlas on Windows `freetype.lib` was built using:<br>
