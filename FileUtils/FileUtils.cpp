@@ -28,6 +28,7 @@ std::string GetTestGlyphKeysPath(machine testNumber)
     std::string prefix {PROJECT_SOURCE_DIR};
     std::string path = prefix + "/TestData/test_.txt";
     path.insert(path.length() - 4, std::to_string(testNumber));
+    std::cout<<PROJECT_SOURCE_DIR;
     return path;
 }
 
@@ -39,13 +40,13 @@ void WriteGlyphTestData(
     std::random_device rd; // obtain a random number from hardware
     std::default_random_engine gen(rd()); // seed the generator
     auto fontIdGen = std::bind(std::uniform_int_distribution<> (0, static_cast<int>(fontCount) - 1), gen);
-    auto fontSizeGen = std::bind(std::uniform_int_distribution<> (8, 12), gen);
+    auto fontSizeGen = std::bind(std::uniform_int_distribution<> (20, 32), gen);
     auto glyphGen = std::bind(std::uniform_int_distribution<> ('a', 'z'), gen);
     auto boolGen = std::bind(std::uniform_int_distribution<> (0, 1), gen);
 
     for (machine i = 0; i < keysCountInPass; i++)
     {
-        out << fontIdGen() << " " << fontSizeGen() << " ";
+        out << 2 << " " << fontSizeGen() << " ";
         if (boolGen())
         {
             out << (char)glyphGen();

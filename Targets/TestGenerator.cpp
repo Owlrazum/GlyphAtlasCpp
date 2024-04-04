@@ -12,7 +12,7 @@ void GenerateTestCase(
 
 int main()
 {
-    GenerateTestCase(0, 20, 1, 400);
+    GenerateTestCase(0, 5, 2, 100);
     return 0;
 }
 

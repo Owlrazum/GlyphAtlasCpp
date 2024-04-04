@@ -16,11 +16,11 @@ target_sources(RectAtlasTest
                )
 target_include_directories(RectAtlasTest PRIVATE .)
 
-target_sources(RectAtlasTestTest
-               PRIVATE
-               Algorithms.cpp
-               )
-target_include_directories(RectAtlasTestTest PRIVATE .)
+#target_sources(RectAtlasTestTest
+#               PRIVATE
+#               Algorithms.cpp
+#               )
+#target_include_directories(RectAtlasTestTest PRIVATE .)
 
 target_sources(GlyphAtlasTest
                PRIVATE

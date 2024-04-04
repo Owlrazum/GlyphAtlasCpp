@@ -13,12 +13,12 @@ target_sources(RectAtlasTest
                )
 target_include_directories(RectAtlasTest PRIVATE . ${SIMDUTF_INCLUDE})
 
-target_link_libraries(RectAtlasTestTest ${SIMDUTF_LIBRARY})
-target_sources(RectAtlasTestTest
-               PRIVATE
-               SimdUtfWrapper.cpp
-               )
-target_include_directories(RectAtlasTestTest PRIVATE . ${SIMDUTF_INCLUDE})
+#target_link_libraries(RectAtlasTestTest ${SIMDUTF_LIBRARY})
+#target_sources(RectAtlasTestTest
+#               PRIVATE
+#               SimdUtfWrapper.cpp
+#               )
+#target_include_directories(RectAtlasTestTest PRIVATE . ${SIMDUTF_INCLUDE})
 
 target_link_libraries(GlyphAtlasTest ${SIMDUTF_LIBRARY})
 target_sources(GlyphAtlasTest

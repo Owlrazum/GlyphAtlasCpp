@@ -1,4 +1,5 @@
 cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
 .idea/
-TestData/
-ResultTextures/
+cmake_install.cmake
